@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Framewerx Data Anonymizer</title>
+<style>
+  /* ---------- PrimeNG-inspired theme (Lara Light Blue-ish) ---------- */
+  :root {
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-active: #1d4ed8;
+    --primary-50: #eff6ff;
+    --surface-ground: #f4f6f9;
+    --surface-card: #ffffff;
+    --surface-hover: #f8f9fa;
+    --surface-border: #e2e8f0;
+    --surface-200: #eef2f7;
+    --text-color: #334155;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --radius: 8px;
+    --radius-sm: 6px;
+    --shadow-card: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-pop: 0 4px 12px rgba(0,0,0,.12);
+    --danger: #ef4444;
+    --danger-hover: #dc2626;
+    --green: #22c55e;
+    font-size: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--surface-ground);
+    color: var(--text-color);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar {
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--surface-border);
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .topbar .logo {
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--primary), #6366f1);
+    display: grid; place-items: center;
+    color: #fff; flex: 0 0 auto;
+  }
+  .topbar h1 { font-size: 1.15rem; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  .topbar .sub { font-size: 0.78rem; color: var(--text-secondary); margin-top: 1px; }
+  .topbar .spacer { flex: 1 1 auto; }
+  .badge-local {
+    font-size: 0.72rem; font-weight: 600; color: #15803d;
+    background: #dcfce7; border: 1px solid #bbf7d0;
+    padding: 0.25rem 0.6rem; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 0.35rem;
+  }
+
+  /* ---------- Layout ---------- */
+  .container { max-width: 1320px; margin: 0 auto; padding: 1.25rem 1.5rem 3rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--surface-border);
+    display: flex; align-items: center; gap: 0.6rem;
+    background: var(--surface-card);
+  }
+  .card-header h2 { font-size: 0.95rem; margin: 0; font-weight: 700; }
+  .card-header .hint { font-size: 0.76rem; color: var(--text-secondary); font-weight: 400; }
+  .card-header .spacer { flex: 1; }
+  .card-body { padding: 1.1rem; }
+
+  /* ---------- Inputs ---------- */
+  textarea, input[type="text"] {
+    width: 100%;
+    font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+    font-size: 0.84rem;
+    color: var(--text-color);
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--radius-sm);
+    padding: 0.65rem 0.75rem;
+    transition: border-color .15s, box-shadow .15s;
+    resize: vertical;
+  }
+  textarea { min-height: 320px; line-height: 1.55; }
+  textarea:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+  }
+  textarea[readonly] { background: #f8fafc; }
+  input[type="text"].sm { font-family: inherit; padding: 0.4rem 0.55rem; font-size: 0.82rem; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    font-family: inherit; font-size: 0.82rem; font-weight: 600;
+    border: 1px solid var(--primary);
+    background: var(--primary); color: #fff;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    transition: background .15s, border-color .15s, box-shadow .15s, color .15s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+  .btn:active { background: var(--primary-active); }
+  .btn:focus-visible { box-shadow: 0 0 0 3px rgba(59,130,246,.35); outline: none; }
+  .btn.outlined { background: transparent; color: var(--primary); }
+  .btn.outlined:hover { background: var(--primary-50); }
+  .btn.subtle { background: transparent; color: var(--text-secondary); border-color: var(--surface-border); }
+  .btn.subtle:hover { background: var(--surface-hover); color: var(--text-color); }
+  .btn.danger { background: transparent; color: var(--danger); border-color: transparent; padding: 0.35rem; }
+  .btn.danger:hover { background: #fef2f2; }
+  .btn.sm { padding: 0.38rem 0.7rem; font-size: 0.78rem; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .icon-btn {
+    border: none; background: transparent; cursor: pointer; color: var(--text-muted);
+    padding: 0.3rem; border-radius: 6px; display: inline-grid; place-items: center;
+    transition: background .15s, color .15s;
+  }
+  .icon-btn:hover { background: var(--surface-hover); color: var(--text-color); }
+  .icon-btn.del:hover { background: #fef2f2; color: var(--danger); }
+
+  .toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+  /* ---------- Type chips (detector toggles) ---------- */
+  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chip {
+    font-size: 0.76rem; font-weight: 600;
+    padding: 0.3rem 0.7rem; border-radius: 999px; cursor: pointer; user-select: none;
+    border: 1px solid var(--surface-border); background: #fff; color: var(--text-secondary);
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    transition: all .15s;
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .85; }
+  .chip.on { color: #fff; border-color: transparent; }
+  .chip.off { opacity: .55; text-decoration: line-through; }
+
+  /* ---------- Variables table ---------- */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+  thead th {
+    text-align: left; font-weight: 600; font-size: 0.74rem;
+    text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-secondary);
+    background: var(--surface-hover);
+    padding: 0.6rem 0.7rem;
+    border-bottom: 1px solid var(--surface-border);
+    white-space: nowrap;
+  }
+  tbody td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--surface-200); vertical-align: middle; }
+  tbody tr:hover { background: #fbfdff; }
+  tbody tr.disabled { opacity: 0.45; }
+  .val-cell { font-family: "SFMono-Regular","Consolas",monospace; word-break: break-all; max-width: 280px; }
+  .tag {
+    font-size: 0.7rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 5px;
+    color: #fff; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.3rem;
+  }
+  .tag.heur { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.55); }
+  .mini { font-size: 0.68rem; color: var(--text-muted); }
+  .token-input { width: 100%; min-width: 130px; }
+  /* token input-group: fixed [ ] affixes so brackets are applied automatically */
+  .token-group { display: flex; align-items: stretch; }
+  .token-group .affix {
+    display: inline-flex; align-items: center; padding: 0 0.4rem;
+    background: var(--surface-hover); border: 1px solid #cbd5e1; color: var(--text-muted);
+    font-family: "SFMono-Regular","Consolas",monospace; font-size: 0.84rem; font-weight: 600;
+  }
+  .token-group .affix.l { border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+  .token-group .affix.r { border-left: none; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .token-group input { flex: 1; min-width: 80px; border-radius: 0 !important; }
+  /* affixes are clickable: pick the wrapper style */
+  .affix { cursor: pointer; user-select: none; transition: background .12s, color .12s; gap: 1px; }
+  .affix:hover { background: var(--surface-200); color: var(--primary); }
+  .affix .wm-caret { opacity: .45; margin-left: 1px; }
+  .affix:hover .wm-caret { opacity: .8; }
+  .wrap-menu {
+    position: fixed; z-index: 100; background: #fff; border: 1px solid var(--surface-border);
+    border-radius: 9px; box-shadow: var(--shadow-pop); padding: 0.3rem; min-width: 190px;
+  }
+  .wrap-menu .wm-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 0.35rem 0.55rem 0.25rem; font-weight: 700; }
+  .wrap-menu button {
+    display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 0.8rem;
+    border: none; background: transparent; cursor: pointer; padding: 0.45rem 0.55rem; border-radius: 6px;
+    font-family: inherit; font-size: 0.82rem; color: var(--text-color); text-align: left;
+  }
+  .wrap-menu button:hover { background: var(--surface-hover); }
+  .wrap-menu button.active { background: var(--primary-50); color: var(--primary); font-weight: 600; }
+  .wrap-menu .ex { font-family: "SFMono-Regular","Consolas",monospace; color: var(--text-secondary); }
+  .wrap-menu button.active .ex { color: var(--primary); }
+  .count-pill {
+    font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);
+    background: var(--surface-hover); border: 1px solid var(--surface-border);
+    border-radius: 999px; padding: 0.1rem 0.5rem;
+  }
+  .center { text-align: center; }
+  .switch { position: relative; display: inline-block; width: 36px; height: 20px; cursor: pointer; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .track { position: absolute; inset: 0; background: #cbd5e1; border-radius: 999px; transition: .2s; }
+  .switch .track:before { content:""; position: absolute; height: 14px; width: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .switch input:checked + .track { background: var(--primary); }
+  .switch input:checked + .track:before { transform: translateX(16px); }
+
+  /* order / reorder controls */
+  .order-cell { white-space: nowrap; }
+  .order-cell .ord {
+    padding: 0.05rem 0.15rem; line-height: 0.8; font-size: 0.6rem; color: var(--text-muted);
+    border: none; background: transparent; cursor: pointer; border-radius: 4px;
+  }
+  .order-cell .ord:hover:not(:disabled) { color: var(--primary); background: var(--surface-hover); }
+  .order-cell .ord:disabled { opacity: .25; cursor: default; }
+  .ord-num { font-size: 0.74rem; font-weight: 700; color: var(--text-secondary); margin: 0 0.1rem; }
+
+  .footer {
+    text-align: center; color: var(--text-muted); font-size: 0.78rem;
+    padding: 2rem 1rem 0.5rem; line-height: 1.7;
+  }
+  .footer a { color: var(--text-secondary); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; color: var(--primary); }
+  .footer .sep { margin: 0 0.45rem; opacity: .45; }
+
+  .empty {
+    text-align: center; color: var(--text-muted); padding: 2.2rem 1rem; font-size: 0.86rem;
+  }
+  .empty svg { display: block; margin: 0 auto 0.6rem; opacity: .4; }
+
+  /* ---------- Add custom form ---------- */
+  .addrow {
+    display: grid; grid-template-columns: 1.4fr 1fr auto auto auto; gap: 0.55rem;
+    align-items: center; padding: 0.8rem; background: var(--surface-hover);
+    border: 1px dashed var(--surface-border); border-radius: var(--radius-sm); margin-top: 0.9rem;
+  }
+  @media (max-width: 720px) { .addrow { grid-template-columns: 1fr 1fr; } }
+  .check { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; color: var(--text-secondary); cursor: pointer; white-space: nowrap; user-select: none; }
+  .check input { accent-color: var(--primary); width: 15px; height: 15px; }
+
+  .stat-row { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.7rem; }
+  .stat-row b { color: var(--text-color); }
+  .char-count { font-size: 0.74rem; color: var(--text-muted); }
+  .toast {
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1e293b; color: #fff; padding: 0.65rem 1.1rem; border-radius: 8px;
+    font-size: 0.82rem; box-shadow: var(--shadow-pop); opacity: 0; pointer-events: none;
+    transition: opacity .2s, transform .2s; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .section-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin: 0 0 0.5rem; }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="logo" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+    </div>
+    <div>
+      <h1>Framewerx Data Anonymizer</h1>
+      <div class="sub">Detect &amp; redact PII before sending text to AI agents</div>
+    </div>
+    <div class="spacer"></div>
+    <span class="badge-local">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      100% local · nothing leaves this page
+    </span>
+  </div>
+
+  <div class="container">
+    <!-- Detector toggles -->
+    <div class="card" style="margin-bottom:1.25rem;">
+      <div class="card-body" style="padding:0.8rem 1.1rem; display:flex; align-items:center; gap:0.9rem; flex-wrap:wrap;">
+        <span class="section-label" style="margin:0;">Detectors</span>
+        <div class="chips" id="detectorChips"></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- INPUT -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Input</h2>
+          <span class="hint">paste logs or any text</span>
+          <span class="spacer"></span>
+          <button class="btn subtle sm" id="sampleBtn">Load sample</button>
+          <button class="btn subtle sm" id="clearBtn">Clear</button>
+        </div>
+        <div class="card-body">
+          <textarea id="input" placeholder="Paste text here. Detection runs automatically as you type…"></textarea>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
+            <button class="btn outlined sm" id="addSelectionBtn" title="Select text above, then click to add it as a variable">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              Add selection as variable
+            </button>
+            <span class="char-count" id="inputCount">0 chars</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- OUTPUT -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Sanitized output</h2>
+          <span class="spacer"></span>
+          <button class="btn outlined sm" id="copyMapBtn" title="Copy the value→token mapping as JSON">Copy mapping</button>
+          <button class="btn sm" id="copyOutBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <div class="card-body">
+          <textarea id="output" readonly placeholder="Sanitized text appears here."></textarea>
+          <div class="stat-row" id="stats"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIABLES -->
+    <div class="card" style="margin-top:1.25rem;">
+      <div class="card-header">
+        <h2>Variables</h2>
+        <span class="hint" id="varHint">reorder to resolve conflicts (top wins) · rename · toggle · remove</span>
+        <span class="spacer"></span>
+        <span class="count-pill" id="varCount">0</span>
+      </div>
+      <div class="card-body">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:58px;" class="center" title="Order — variables higher in the list win conflicts">Order</th>
+                <th style="width:42px;" class="center">On</th>
+                <th>Original value</th>
+                <th style="width:55px;" class="center">Count</th>
+                <th>Type</th>
+                <th>Replacement token</th>
+                <th style="width:70px;" class="center" title="Match whole words only">Whole<br>word</th>
+                <th style="width:70px;" class="center" title="Case-insensitive match">Ignore<br>case</th>
+                <th style="width:44px;"></th>
+              </tr>
+            </thead>
+            <tbody id="varBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty" style="display:none;">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+          No variables yet. Paste text above, or add a custom one below.
+        </div>
+
+        <!-- Add custom -->
+        <p class="section-label" style="margin-top:1.2rem;">Add a custom variable</p>
+        <div class="addrow">
+          <input type="text" class="sm" id="customValue" placeholder="Text to find (e.g. a name)" />
+          <div class="token-group"><span class="affix l" title="Click to change wrapper style"><span class="ch">[</span></span><input type="text" class="sm" id="customToken" placeholder="Token name (e.g. Name)" /><span class="affix r" title="Click to change wrapper style"><span class="ch">]</span><svg class="wm-caret" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+          <label class="check"><input type="checkbox" id="customWhole" checked /> Whole word</label>
+          <label class="check"><input type="checkbox" id="customCase" checked /> Ignore case</label>
+          <button class="btn sm" id="addCustomBtn">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    &copy; <span id="year">2026</span> Framewerx Inc. &middot; Framewerx Data Anonymizer
+    <span class="sep">&bull;</span> Runs entirely in your browser &mdash; nothing is uploaded
+    <span class="sep">&bull;</span> <a href="https://github.com/Framewerx/data-anonymizer" target="_blank" rel="noopener">Source</a>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Data Anonymizer — fully client-side PII detection + redaction
+   ============================================================ */
+
+// ---- helpers --------------------------------------------------
+const $ = (id) => document.getElementById(id);
+function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+// ---- detector definitions ------------------------------------
+// priority: lower = wins overlaps. color used for type tag.
+const TYPES = {
+  UserEmail:  { label: "Email",       token: "UserEmail",  color: "#3b82f6", priority: 1 },
+  MacAddress: { label: "MAC",         token: "MacAddress", color: "#8b5cf6", priority: 2 },
+  IPAddress:  { label: "IP",          token: "IPAddress",  color: "#0ea5e9", priority: 3 },
+  UUID:       { label: "UUID / ID",   token: "UUID",       color: "#14b8a6", priority: 4 },
+  NumericID:  { label: "Numeric ID",  token: "NumericID",  color: "#f59e0b", priority: 5 },
+  ServerName: { label: "Server/Host", token: "ServerName", color: "#ec4899", priority: 6, heuristic: true },
+  Name:       { label: "Name",        token: "Name",       color: "#10b981", priority: 7, heuristic: true },
+  Custom:     { label: "Custom",      token: "Var",        color: "#64748b", priority: 0 },
+};
+
+function matchAll(text, re) {
+  const out = [];
+  for (const m of text.matchAll(re)) {
+    if (m[0].length === 0) continue;
+    out.push({ value: m[0], start: m.index, end: m.index + m[0].length });
+  }
+  return out;
+}
+
+const REGEX_DETECTORS = [
+  { type: "UserEmail",  fn: t => matchAll(t, /[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g) },
+  { type: "MacAddress", fn: t => matchAll(t, /\b(?:[0-9A-Fa-f]{2}[:\-]){5}[0-9A-Fa-f]{2}\b/g) },
+  { type: "IPAddress",  fn: t => matchAll(t, /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g) },
+  // UUID: standard 8-4-4-4-12 OR loose hyphenated alphanumeric token (must contain a digit)
+  { type: "UUID", fn: t => {
+      const std = /\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/g;
+      const loose = /\b[0-9a-zA-Z]{3,}(?:-[0-9a-zA-Z]{3,})+\b/g;
+      const res = matchAll(t, std);
+      for (const m of matchAll(t, loose)) {
+        if (/\d/.test(m.value) && !res.some(r => r.start === m.start)) res.push(m);
+      }
+      return res;
+  }},
+  // 4+ digit run, but not when it's part of a hyphenated/word token (e.g. the 1137 in DS-1137)
+  { type: "NumericID",  fn: t => matchAll(t, /(?<![\w-])\d{4,}(?![\w-])/g) },
+  // Server/host: capture the token following a host keyword
+  { type: "ServerName", fn: t => {
+      const out = [];
+      const re = /\b(?:server|servers|host|hostname|node|machine|instance|vm|box)s?\s+([A-Za-z][A-Za-z0-9._\-]{0,})/gi;
+      for (const m of t.matchAll(re)) {
+        const g = m[1];
+        if (!g || g.length < 2) continue;
+        const start = m.index + m[0].length - g.length;
+        out.push({ value: g, start, end: start + g.length });
+      }
+      return out;
+  }},
+  // Names following a label. Supports FirstName / First Name / FirstName: / First Name:
+  // and the same for LastName and Username, plus GivenName / Surname / FullName. The strong
+  // name-field labels accept a ':'/'=' OR a plain space; weaker labels (name/user/customer/…)
+  // require a ':'/'='. With an explicit ':'/'=' the value may be any case (e.g.
+  // "Username: obiwan"); with only a space the value must be Capitalized (so a phrase like
+  // "First name is required" is ignored). Captured names are redacted everywhere they appear.
+  { type: "Name", fn: t => {
+      const out = [];
+      const re = /\b(?:(first|last|given|sur|full|user)[ \t_-]?name|name|user|customer|client|employee|contact|owner|assigned to)\b([ \t]*[:=][ \t]*|[ \t]+)([A-Za-z][A-Za-z'’.\-]*)(?:([ \t]+)([A-Za-z][A-Za-z'’.\-]*))?/gi;
+      for (const m of t.matchAll(re)) {
+        const isStrong = !!m[1];
+        const hasColon = /[:=]/.test(m[2]);
+        const w1 = m[3];
+        if (!hasColon) {
+          if (!isStrong) continue;          // weak labels require an explicit : or =
+          if (!/^[A-Z]/.test(w1)) continue; // bare-space labels need a Capitalized value
+        }
+        let value = w1;
+        if (m[5] && /^[A-Z]/.test(m[5])) value = w1 + m[4] + m[5]; // add 2nd word only if Capitalized
+        const tail = m[3] + (m[4] || "") + (m[5] || "");
+        const start = m.index + m[0].length - tail.length;
+        out.push({ value, start, end: start + value.length });
+      }
+      return out;
+  }},
+];
+
+// Names derived from detected emails (e.g. jane.doe@ -> jane, doe)
+function deriveNames(text, emailOccs) {
+  const out = [];
+  const seen = new Set();
+  const emailSpans = emailOccs.map(o => [o.start, o.end]);
+  const inEmail = (i) => emailSpans.some(([s, e]) => i >= s && i < e);
+  const bases = new Set();
+  for (const o of emailOccs) {
+    const local = o.value.split("@")[0];
+    for (const part of local.split(/[._\-+0-9]+/)) {
+      if (part.length >= 2 && /[A-Za-z]/.test(part)) bases.add(part.toLowerCase());
+    }
+  }
+  for (const base of bases) {
+    const re = new RegExp("\\b" + escapeRe(base) + "\\b", "gi");
+    let firstStandalone = -1;
+    for (const m of text.matchAll(re)) {
+      if (!inEmail(m.index)) { firstStandalone = m.index; break; }
+    }
+    if (firstStandalone >= 0 && !seen.has(base)) {
+      seen.add(base);
+      out.push({ value: base, start: firstStandalone, end: firstStandalone + base.length });
+    }
+  }
+  return out;
+}
+
+// ---- detection (returns candidate {value,type,first}) --------
+function detect(text) {
+  const claimed = new Set();
+  const found = [];
+  let emailOccs = [];
+  for (const d of REGEX_DETECTORS) {
+    if (state.disabledTypes.has(d.type)) {
+      if (d.type === "UserEmail") emailOccs = []; // names depend on emails
+      continue;
+    }
+    const occs = d.fn(text);
+    if (d.type === "UserEmail") emailOccs = occs;
+    for (const o of occs) {
+      if (claimed.has(o.value)) continue;
+      claimed.add(o.value);
+      found.push({ value: o.value, type: d.type, first: o.start });
+    }
+  }
+  if (!state.disabledTypes.has("Name") && emailOccs.length) {
+    for (const n of deriveNames(text, emailOccs)) {
+      if (claimed.has(n.value)) continue;
+      claimed.add(n.value);
+      found.push({ value: n.value, type: "Name", first: n.start });
+    }
+  }
+  return found;
+}
+
+// ---- wrapper styles ------------------------------------------
+// Brackets are applied automatically; the affix is clickable to switch style.
+const WRAPPERS = [
+  { label: "Square",       open: "[",  close: "]" },
+  { label: "Curly",        open: "{",  close: "}" },
+  { label: "Double curly", open: "{{", close: "}}" },
+  { label: "Parentheses",  open: "(",  close: ")" },
+  { label: "Angle",        open: "<",  close: ">" },
+  { label: "Double angle", open: "<<", close: ">>" },
+  { label: "Guillemets",   open: "«", close: "»" },
+  { label: "Equals",       open: "=",  close: "=" },
+  { label: "Percent",      open: "%",  close: "%" },
+];
+function wrap(token) { return state.wrapper.open + token + state.wrapper.close; }
+
+// ---- application state ---------------------------------------
+const state = {
+  text: "",
+  variables: [],            // {id,value,token,type,enabled,wholeWord,ignoreCase,source,tokenEdited}
+  dismissed: new Set(),     // auto-detected values the user removed
+  disabledTypes: new Set(), // detector types switched off
+  wrapper: WRAPPERS[0],     // token wrapper style
+};
+let nextId = 1;
+
+const DEFAULT_FLAGS = {
+  Name:       { wholeWord: true,  ignoreCase: true },
+  ServerName: { wholeWord: true,  ignoreCase: false },
+  NumericID:  { wholeWord: true,  ignoreCase: false },
+};
+function makeVar(f) {
+  const flags = DEFAULT_FLAGS[f.type] || { wholeWord: false, ignoreCase: false };
+  return {
+    id: nextId++, value: f.value, type: f.type, token: "",
+    enabled: true, source: "auto", tokenEdited: false, first: f.first,
+    wholeWord: flags.wholeWord, ignoreCase: flags.ignoreCase,
+  };
+}
+
+function reanalyze() {
+  const found = detect(state.text).filter(f => !state.dismissed.has(f.value));
+  const foundByVal = new Map(found.map(f => [f.value, f]));
+  // Keep existing variables in their current (possibly user-sorted) order so manual
+  // reordering survives re-scans. Drop auto variables whose value is gone; keep customs.
+  const kept = [];
+  for (const v of state.variables) {
+    if (v.source === "custom") { kept.push(v); continue; }
+    const f = foundByVal.get(v.value);
+    if (f) { v.type = f.type; v.first = f.first; kept.push(v); }
+  }
+  const existing = new Set(kept.map(v => v.value));
+  const fresh = found.filter(f => !existing.has(f.value)).map(makeVar);
+  fresh.sort((a, b) => (a.first ?? 1e9) - (b.first ?? 1e9)); // new ones ordered by first appearance
+  state.variables = kept.concat(fresh);
+  assignTokens(state.variables);
+}
+
+function assignTokens(vars) {
+  const totals = {}, seen = {};
+  for (const v of vars) totals[v.type] = (totals[v.type] || 0) + 1;
+  for (const v of vars) {
+    if (v.tokenEdited) continue;
+    seen[v.type] = (seen[v.type] || 0) + 1;
+    const base = TYPES[v.type].token;
+    v.token = totals[v.type] > 1 ? `${base}${seen[v.type]}` : base;
+  }
+}
+
+// ---- sanitize -------------------------------------------------
+function buildRegex(v) {
+  let p = escapeRe(v.value);
+  if (v.wholeWord) {
+    if (/^[\w]/.test(v.value)) p = "\\b" + p;
+    if (/[\w]$/.test(v.value)) p = p + "\\b";
+  }
+  return new RegExp(p, "g" + (v.ignoreCase ? "i" : ""));
+}
+
+function sanitize() {
+  const text = state.text;
+  const vars = state.variables.filter(v => v.enabled && !state.disabledTypes.has(v.type) && v.value);
+  const counts = {};
+  const claimed = []; // {start, end, token, id} — claimed in list order (= precedence)
+  const overlaps = (s, e) => claimed.some(c => s < c.end && e > c.start);
+  // Apply variables top-to-bottom: an earlier (higher) variable claims its matches
+  // first, so it wins any conflict. Claiming on the original text also guarantees no
+  // double-replacement.
+  for (const v of vars) {
+    let re;
+    try { re = buildRegex(v); } catch (e) { continue; }
+    counts[v.id] = 0;
+    for (const m of text.matchAll(re)) {
+      if (m[0].length === 0) continue;
+      const s = m.index, e = s + m[0].length;
+      if (overlaps(s, e)) continue; // region already taken by a higher-precedence variable
+      claimed.push({ start: s, end: e, token: wrap(v.token), id: v.id });
+      counts[v.id]++;
+    }
+  }
+  claimed.sort((a, b) => a.start - b.start);
+  let out = "", cursor = 0, replaced = 0;
+  for (const c of claimed) {
+    out += text.slice(cursor, c.start) + c.token;
+    cursor = c.end;
+    replaced++;
+  }
+  out += text.slice(cursor);
+  return { out, counts, replaced };
+}
+
+// ---- rendering ------------------------------------------------
+function renderChips() {
+  const wrap = $("detectorChips");
+  wrap.innerHTML = "";
+  for (const [type, def] of Object.entries(TYPES)) {
+    if (type === "Custom") continue;
+    const on = !state.disabledTypes.has(type);
+    const chip = document.createElement("span");
+    chip.className = "chip " + (on ? "on" : "off");
+    chip.style.background = on ? def.color : "#fff";
+    chip.style.borderColor = on ? def.color : "var(--surface-border)";
+    chip.innerHTML = `<span class="dot"></span>${def.label}`;
+    chip.onclick = () => {
+      if (on) state.disabledTypes.add(type); else state.disabledTypes.delete(type);
+      reanalyze(); render();
+    };
+    wrap.appendChild(chip);
+  }
+}
+
+function renderVariables(counts) {
+  const body = $("varBody");
+  body.innerHTML = "";
+  const vars = state.variables;
+  $("emptyState").style.display = vars.length ? "none" : "block";
+  $("varCount").textContent = vars.length;
+
+  for (let idx = 0; idx < vars.length; idx++) {
+    const v = vars[idx];
+    const def = TYPES[v.type];
+    const tr = document.createElement("tr");
+    if (!v.enabled || state.disabledTypes.has(v.type)) tr.className = "disabled";
+    const cnt = counts[v.id] || 0;
+
+    const tagHeur = def.heuristic ? `<span class="tag heur" style="background:${def.color}">${def.label}<span class="mini" style="color:#fff;opacity:.85;">~</span></span>` : `<span class="tag" style="background:${def.color}">${def.label}</span>`;
+
+    tr.innerHTML = `
+      <td class="center order-cell">
+        <button class="ord" data-act="up" ${idx === 0 ? "disabled" : ""} title="Move up — higher precedence">&#9650;</button>
+        <span class="ord-num">${idx + 1}</span>
+        <button class="ord" data-act="down" ${idx === vars.length - 1 ? "disabled" : ""} title="Move down">&#9660;</button>
+      </td>
+      <td class="center">
+        <label class="switch"><input type="checkbox" data-act="toggle" ${v.enabled ? "checked" : ""}><span class="track"></span></label>
+      </td>
+      <td class="val-cell">${escapeHtml(v.value)}${v.source === "custom" ? ' <span class="mini">(custom)</span>' : ""}</td>
+      <td class="center"><span class="count-pill">${cnt}</span></td>
+      <td>${tagHeur}</td>
+      <td><div class="token-group"><span class="affix l" title="Click to change wrapper style"><span class="ch">${escapeHtml(state.wrapper.open)}</span></span><input type="text" class="sm token-input" data-act="token" value="${escapeHtml(v.token)}"><span class="affix r" title="Click to change wrapper style"><span class="ch">${escapeHtml(state.wrapper.close)}</span><svg class="wm-caret" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></td>
+      <td class="center"><input type="checkbox" data-act="whole" ${v.wholeWord ? "checked" : ""} style="accent-color:var(--primary);width:15px;height:15px;"></td>
+      <td class="center"><input type="checkbox" data-act="case" ${v.ignoreCase ? "checked" : ""} style="accent-color:var(--primary);width:15px;height:15px;"></td>
+      <td class="center">
+        <button class="icon-btn del" data-act="del" title="Remove (not PII)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </td>`;
+
+    tr.querySelector('[data-act="up"]').onclick = () => move(v.id, -1);
+    tr.querySelector('[data-act="down"]').onclick = () => move(v.id, 1);
+    tr.querySelector('[data-act="toggle"]').onchange = e => { v.enabled = e.target.checked; render(); };
+    tr.querySelector('[data-act="whole"]').onchange = e => { v.wholeWord = e.target.checked; render(); };
+    tr.querySelector('[data-act="case"]').onchange = e => { v.ignoreCase = e.target.checked; render(); };
+    tr.querySelector('[data-act="del"]').onclick = () => {
+      if (v.source !== "custom") state.dismissed.add(v.value);
+      state.variables = state.variables.filter(x => x.id !== v.id);
+      render();
+    };
+    const ti = tr.querySelector('[data-act="token"]');
+    ti.oninput = e => {
+      const clean = e.target.value.replace(/[\[\]]/g, ""); // brackets are applied automatically
+      if (clean !== e.target.value) e.target.value = clean;
+      v.token = clean; v.tokenEdited = true; renderOutput();
+    };
+    body.appendChild(tr);
+  }
+}
+
+function move(id, dir) {
+  const i = state.variables.findIndex(v => v.id === id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= state.variables.length) return;
+  const a = state.variables;
+  [a[i], a[j]] = [a[j], a[i]];
+  assignTokens(a);
+  render();
+}
+
+function renderOutput() {
+  const { out, counts, replaced } = sanitize();
+  $("output").value = out;
+  const active = state.variables.filter(v => v.enabled && !state.disabledTypes.has(v.type)).length;
+  $("stats").innerHTML =
+    `<span><b>${active}</b> active variable${active === 1 ? "" : "s"}</span>` +
+    `<span><b>${replaced}</b> replacement${replaced === 1 ? "" : "s"} made</span>` +
+    `<span><b>${state.text.length}</b> chars in</span>`;
+  return counts;
+}
+
+function render() {
+  renderChips();
+  const counts = renderOutput();
+  renderVariables(counts);
+  // refresh wrapper affix characters everywhere (incl. custom form)
+  document.querySelectorAll(".affix.l .ch").forEach(e => e.textContent = state.wrapper.open);
+  document.querySelectorAll(".affix.r .ch").forEach(e => e.textContent = state.wrapper.close);
+}
+
+// ---- wrapper-style dropdown ----------------------------------
+let wrapMenuEl = null;
+function closeWrapMenu() { if (wrapMenuEl) { wrapMenuEl.remove(); wrapMenuEl = null; } }
+function openWrapMenu(anchor) {
+  closeWrapMenu();
+  const menu = document.createElement("div");
+  menu.className = "wrap-menu";
+  menu.innerHTML = '<div class="wm-title">Wrapper style</div>';
+  for (const w of WRAPPERS) {
+    const b = document.createElement("button");
+    if (w.open === state.wrapper.open && w.close === state.wrapper.close) b.className = "active";
+    b.innerHTML = `<span>${escapeHtml(w.label)}</span><span class="ex">${escapeHtml(w.open + "Name" + w.close)}</span>`;
+    b.onclick = (e) => { e.stopPropagation(); state.wrapper = w; closeWrapMenu(); render(); toast(`Wrapper: ${w.open}…${w.close}`); };
+    menu.appendChild(b);
+  }
+  document.body.appendChild(menu);
+  const r = anchor.getBoundingClientRect();
+  let left = r.left, top = r.bottom + 4;
+  if (left + menu.offsetWidth > window.innerWidth - 8) left = window.innerWidth - menu.offsetWidth - 8;
+  if (top + menu.offsetHeight > window.innerHeight - 8) top = r.top - menu.offsetHeight - 4;
+  menu.style.left = Math.max(8, left) + "px";
+  menu.style.top = Math.max(8, top) + "px";
+  wrapMenuEl = menu;
+}
+document.addEventListener("click", (e) => {
+  const affix = e.target.closest(".affix");
+  if (affix) { e.stopPropagation(); openWrapMenu(affix); return; }
+  if (wrapMenuEl && !e.target.closest(".wrap-menu")) closeWrapMenu();
+});
+window.addEventListener("resize", closeWrapMenu);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeWrapMenu(); });
+
+// ---- events ---------------------------------------------------
+const onInput = debounce(() => {
+  state.text = $("input").value;
+  $("inputCount").textContent = state.text.length + " chars";
+  reanalyze();
+  render();
+}, 200);
+
+$("input").addEventListener("input", () => {
+  $("inputCount").textContent = $("input").value.length + " chars";
+  onInput();
+});
+
+$("addCustomBtn").onclick = () => {
+  const value = $("customValue").value.trim();
+  if (!value) { toast("Enter text to find"); return; }
+  let token = $("customToken").value.trim().replace(/[\[\]]/g, "");
+  if (!token) token = "Var";
+  if (state.variables.some(v => v.value === value)) { toast("That value already exists"); return; }
+  state.dismissed.delete(value);
+  // Add at the top: a deliberately-added custom is an override and gets the highest
+  // precedence by default. The user can reorder it down if they prefer.
+  state.variables.unshift({
+    id: nextId++, value, token, type: "Custom", enabled: true,
+    source: "custom", tokenEdited: true, first: state.text.indexOf(value),
+    wholeWord: $("customWhole").checked, ignoreCase: $("customCase").checked,
+  });
+  $("customValue").value = ""; $("customToken").value = "";
+  render();
+  toast("Variable added at top (highest precedence)");
+};
+$("customValue").addEventListener("keydown", e => { if (e.key === "Enter") $("addCustomBtn").click(); });
+$("customToken").addEventListener("keydown", e => { if (e.key === "Enter") $("addCustomBtn").click(); });
+
+$("addSelectionBtn").onclick = () => {
+  const ta = $("input");
+  const sel = ta.value.substring(ta.selectionStart, ta.selectionEnd).trim();
+  if (!sel) { toast("Select some text in the input first"); return; }
+  $("customValue").value = sel;
+  $("customToken").focus();
+};
+
+$("sampleBtn").onclick = () => {
+  $("input").value = SAMPLE;
+  state.text = SAMPLE;
+  $("inputCount").textContent = SAMPLE.length + " chars";
+  reanalyze();
+  render();
+};
+$("clearBtn").onclick = () => {
+  $("input").value = "";
+  state.text = ""; state.variables = []; state.dismissed.clear();
+  $("inputCount").textContent = "0 chars";
+  render();
+};
+
+$("copyOutBtn").onclick = () => copy($("output").value, "Sanitized output copied");
+$("copyMapBtn").onclick = () => {
+  const map = {};
+  for (const v of state.variables) if (v.enabled) map[wrap(v.token)] = v.value;
+  copy(JSON.stringify(map, null, 2), "Mapping copied as JSON");
+};
+
+function copy(text, msg) {
+  if (!text) { toast("Nothing to copy"); return; }
+  navigator.clipboard.writeText(text).then(() => toast(msg)).catch(() => {
+    // fallback for non-secure contexts (file://)
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); toast(msg); } catch (e) { toast("Copy failed"); }
+    document.body.removeChild(ta);
+  });
+}
+
+let toastT;
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+const SAMPLE = `darth.vader@empire.gov logged in from server DS-1137 at 12:59PM (9.2.12.33)
+email (id: a7d6dfs-sdf9234-sdaf8ff) triggered to mon.mothma@thesenate.org at 14:44
+server 9.2.12.33 went down
+email (id: a7d6dfs-sdf9234-sdaf8ff) failed to send
+Vader is not happy about this failure on server DS-1137
+Another person involved is Han Solo
+First Name: Han
+Last Name: Solo`;
+
+// ---- init -----------------------------------------------------
+$("year").textContent = new Date().getFullYear();
+render();
+</script>
+</body>
+</html>

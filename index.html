@@ -25,7 +25,7 @@
     --shadow-pop: 0 4px 12px rgba(0,0,0,.12);
     --danger: #ef4444;
     --danger-hover: #dc2626;
-    --green: #22c55e;
+    --amber: #d97706;
     font-size: 14px;
   }
   * { box-sizing: border-box; }
@@ -36,29 +36,27 @@
     color: var(--text-color);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   /* ---------- Topbar ---------- */
   .topbar {
     background: var(--surface-card);
     border-bottom: 1px solid var(--surface-border);
-    padding: 0.9rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    position: sticky;
-    top: 0;
-    z-index: 20;
+    padding: 0.7rem 1.25rem;
+    display: flex; align-items: center; gap: 0.9rem;
+    flex: 0 0 auto;
   }
   .topbar .logo {
-    width: 38px; height: 38px;
-    border-radius: 9px;
+    width: 36px; height: 36px; border-radius: 9px;
     background: linear-gradient(135deg, var(--primary), #6366f1);
-    display: grid; place-items: center;
-    color: #fff; flex: 0 0 auto;
+    display: grid; place-items: center; color: #fff; flex: 0 0 auto;
   }
-  .topbar h1 { font-size: 1.15rem; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
-  .topbar .sub { font-size: 0.78rem; color: var(--text-secondary); margin-top: 1px; }
+  .topbar h1 { font-size: 1.1rem; margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+  .topbar .sub { font-size: 0.76rem; color: var(--text-secondary); margin-top: 1px; }
   .topbar .spacer { flex: 1 1 auto; }
   .badge-local {
     font-size: 0.72rem; font-weight: 600; color: #15803d;
@@ -67,62 +65,85 @@
     display: inline-flex; align-items: center; gap: 0.35rem;
   }
 
-  /* ---------- Layout ---------- */
-  .container { max-width: 1320px; margin: 0 auto; padding: 1.25rem 1.5rem 3rem; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
-  @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+  /* segmented mode control */
+  .seg { display: inline-flex; border: 1px solid var(--surface-border); border-radius: 999px; background: var(--surface-hover); padding: 2px; }
+  .seg button {
+    border: none; background: transparent; cursor: pointer; font-family: inherit;
+    font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
+    padding: 0.35rem 0.85rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.4rem;
+    transition: all .15s;
+  }
+  .seg button.active { background: var(--primary); color: #fff; box-shadow: var(--shadow-card); }
+
+  /* ---------- Sub bar (detectors + direction) ---------- */
+  .subbar {
+    flex: 0 0 auto;
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--surface-border);
+    padding: 0.55rem 1.25rem;
+    display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap;
+  }
+  .subbar .spacer { flex: 1; }
+  .section-label { font-size: 0.74rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; }
+
+  .direction {
+    display: inline-flex; align-items: center; gap: 0.55rem;
+    font-size: 0.8rem; font-weight: 600; color: var(--text-color);
+    background: var(--surface-hover); border: 1px solid var(--surface-border);
+    border-radius: 999px; padding: 0.3rem 0.8rem;
+  }
+  .direction .arrow { color: var(--primary); font-weight: 800; letter-spacing: -1px; }
+
+  /* ---------- Disclaimer banner ---------- */
+  .banner {
+    flex: 0 0 auto;
+    background: #fffbeb; border-bottom: 1px solid #fde68a; color: #92400e;
+    font-size: 0.78rem; padding: 0.4rem 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem; justify-content: center;
+  }
+  .banner b { font-weight: 700; }
+
+  /* ---------- Workspace ---------- */
+  .workspace { flex: 1; min-height: 0; display: flex; gap: 1rem; padding: 1rem 1.25rem; overflow: hidden; }
+  .panes { flex: 1; min-width: 0; display: flex; gap: 1rem; }
 
   .card {
-    background: var(--surface-card);
-    border: 1px solid var(--surface-border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-card);
-    overflow: hidden;
+    background: var(--surface-card); border: 1px solid var(--surface-border);
+    border-radius: var(--radius); box-shadow: var(--shadow-card);
+    display: flex; flex-direction: column; overflow: hidden;
   }
+  .pane { flex: 1; min-width: 0; }
+  .sidebar { width: 410px; flex: 0 0 410px; }
   .card-header {
-    padding: 0.85rem 1.1rem;
-    border-bottom: 1px solid var(--surface-border);
-    display: flex; align-items: center; gap: 0.6rem;
-    background: var(--surface-card);
+    padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--surface-border);
+    display: flex; align-items: center; gap: 0.5rem; flex: 0 0 auto; flex-wrap: wrap;
   }
-  .card-header h2 { font-size: 0.95rem; margin: 0; font-weight: 700; }
-  .card-header .hint { font-size: 0.76rem; color: var(--text-secondary); font-weight: 400; }
+  .card-header h2 { font-size: 0.9rem; margin: 0; font-weight: 700; }
+  .card-header .hint { font-size: 0.74rem; color: var(--text-secondary); font-weight: 400; }
   .card-header .spacer { flex: 1; }
-  .card-body { padding: 1.1rem; }
+  .card-body { padding: 0.8rem; flex: 1; min-height: 0; display: flex; flex-direction: column; }
 
   /* ---------- Inputs ---------- */
   textarea, input[type="text"] {
-    width: 100%;
-    font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
-    font-size: 0.84rem;
-    color: var(--text-color);
-    background: #fff;
-    border: 1px solid #cbd5e1;
-    border-radius: var(--radius-sm);
-    padding: 0.65rem 0.75rem;
-    transition: border-color .15s, box-shadow .15s;
-    resize: vertical;
+    width: 100%; font-family: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+    font-size: 0.83rem; color: var(--text-color); background: #fff;
+    border: 1px solid #cbd5e1; border-radius: var(--radius-sm);
+    padding: 0.55rem 0.7rem; transition: border-color .15s, box-shadow .15s;
   }
-  textarea { min-height: 320px; line-height: 1.55; }
+  textarea { flex: 1; min-height: 0; resize: none; line-height: 1.55; }
   textarea:focus, input[type="text"]:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+    outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,.18);
   }
   textarea[readonly] { background: #f8fafc; }
-  input[type="text"].sm { font-family: inherit; padding: 0.4rem 0.55rem; font-size: 0.82rem; }
+  input[type="text"].sm { font-family: inherit; padding: 0.35rem 0.5rem; font-size: 0.8rem; }
 
   /* ---------- Buttons ---------- */
   .btn {
-    font-family: inherit; font-size: 0.82rem; font-weight: 600;
-    border: 1px solid var(--primary);
-    background: var(--primary); color: #fff;
-    padding: 0.5rem 0.9rem;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    display: inline-flex; align-items: center; gap: 0.45rem;
-    transition: background .15s, border-color .15s, box-shadow .15s, color .15s;
-    white-space: nowrap;
+    font-family: inherit; font-size: 0.8rem; font-weight: 600;
+    border: 1px solid var(--primary); background: var(--primary); color: #fff;
+    padding: 0.45rem 0.8rem; border-radius: var(--radius-sm); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    transition: background .15s, border-color .15s, box-shadow .15s, color .15s; white-space: nowrap;
   }
   .btn:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
   .btn:active { background: var(--primary-active); }
@@ -131,144 +152,117 @@
   .btn.outlined:hover { background: var(--primary-50); }
   .btn.subtle { background: transparent; color: var(--text-secondary); border-color: var(--surface-border); }
   .btn.subtle:hover { background: var(--surface-hover); color: var(--text-color); }
-  .btn.danger { background: transparent; color: var(--danger); border-color: transparent; padding: 0.35rem; }
-  .btn.danger:hover { background: #fef2f2; }
-  .btn.sm { padding: 0.38rem 0.7rem; font-size: 0.78rem; }
+  .btn.sm { padding: 0.32rem 0.6rem; font-size: 0.76rem; }
   .btn:disabled { opacity: .5; cursor: not-allowed; }
-  .icon-btn {
-    border: none; background: transparent; cursor: pointer; color: var(--text-muted);
-    padding: 0.3rem; border-radius: 6px; display: inline-grid; place-items: center;
-    transition: background .15s, color .15s;
-  }
+
+  .icon-btn { border: none; background: transparent; cursor: pointer; color: var(--text-muted); padding: 0.28rem; border-radius: 6px; display: inline-grid; place-items: center; transition: background .15s, color .15s; }
   .icon-btn:hover { background: var(--surface-hover); color: var(--text-color); }
   .icon-btn.del:hover { background: #fef2f2; color: var(--danger); }
 
-  .toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-
   /* ---------- Type chips (detector toggles) ---------- */
-  .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
   .chip {
-    font-size: 0.76rem; font-weight: 600;
-    padding: 0.3rem 0.7rem; border-radius: 999px; cursor: pointer; user-select: none;
-    border: 1px solid var(--surface-border); background: #fff; color: var(--text-secondary);
-    display: inline-flex; align-items: center; gap: 0.35rem;
-    transition: all .15s;
+    font-size: 0.74rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 999px;
+    cursor: pointer; user-select: none; border: 1px solid var(--surface-border);
+    background: #fff; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 0.3rem; transition: all .15s;
   }
   .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .85; }
   .chip.on { color: #fff; border-color: transparent; }
-  .chip.off { opacity: .55; text-decoration: line-through; }
+  .chip.off { opacity: .5; text-decoration: line-through; }
 
-  /* ---------- Variables table ---------- */
-  .tbl-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
-  thead th {
-    text-align: left; font-weight: 600; font-size: 0.74rem;
-    text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-secondary);
-    background: var(--surface-hover);
-    padding: 0.6rem 0.7rem;
-    border-bottom: 1px solid var(--surface-border);
-    white-space: nowrap;
-  }
-  tbody td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--surface-200); vertical-align: middle; }
-  tbody tr:hover { background: #fbfdff; }
-  tbody tr.disabled { opacity: 0.45; }
-  .val-cell { font-family: "SFMono-Regular","Consolas",monospace; word-break: break-all; max-width: 280px; }
-  .tag {
-    font-size: 0.7rem; font-weight: 700; padding: 0.18rem 0.5rem; border-radius: 5px;
-    color: #fff; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.3rem;
-  }
+  /* ---------- Variable cards (sidebar) ---------- */
+  .var-scroll { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -0.2rem; padding: 0 0.2rem; }
+  .var-card { border: 1px solid var(--surface-border); border-radius: 8px; padding: 0.55rem 0.6rem; margin-bottom: 0.5rem; background: #fff; }
+  .var-card.disabled { opacity: 0.5; }
+  .var-row { display: flex; align-items: center; gap: 0.45rem; }
+  .var-row + .var-row { margin-top: 0.5rem; }
+  .var-order { display: flex; flex-direction: column; align-items: center; line-height: 0.7; flex: 0 0 auto; }
+  .var-order .ord { padding: 0; font-size: 0.62rem; color: var(--text-muted); border: none; background: transparent; cursor: pointer; }
+  .var-order .ord:hover:not(:disabled) { color: var(--primary); }
+  .var-order .ord:disabled { opacity: .25; cursor: default; }
+  .var-order .ord-num { font-size: 0.68rem; font-weight: 700; color: var(--text-secondary); }
+  .value-input { flex: 1; min-width: 0; }
+  .tag { font-size: 0.66rem; font-weight: 700; padding: 0.14rem 0.42rem; border-radius: 5px; color: #fff; white-space: nowrap; flex: 0 0 auto; }
   .tag.heur { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.55); }
-  .mini { font-size: 0.68rem; color: var(--text-muted); }
-  .token-input { width: 100%; min-width: 130px; }
-  /* token input-group: fixed [ ] affixes so brackets are applied automatically */
-  .token-group { display: flex; align-items: stretch; }
+  .count-pill { font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); background: var(--surface-hover); border: 1px solid var(--surface-border); border-radius: 999px; padding: 0.05rem 0.45rem; flex: 0 0 auto; }
+  .flags { display: flex; align-items: center; gap: 0.7rem; font-size: 0.74rem; color: var(--text-secondary); flex: 1; }
+  .check { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; user-select: none; white-space: nowrap; }
+  .check input { accent-color: var(--primary); width: 14px; height: 14px; }
+
+  .switch { position: relative; display: inline-block; width: 34px; height: 19px; cursor: pointer; flex: 0 0 auto; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .track { position: absolute; inset: 0; background: #cbd5e1; border-radius: 999px; transition: .2s; }
+  .switch .track:before { content:""; position: absolute; height: 13px; width: 13px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+  .switch input:checked + .track { background: var(--primary); }
+  .switch input:checked + .track:before { transform: translateX(15px); }
+
+  /* token input-group with clickable wrapper affixes */
+  .token-group { display: flex; align-items: stretch; flex: 1; min-width: 0; }
   .token-group .affix {
-    display: inline-flex; align-items: center; padding: 0 0.4rem;
+    display: inline-flex; align-items: center; padding: 0 0.38rem; cursor: pointer; user-select: none;
     background: var(--surface-hover); border: 1px solid #cbd5e1; color: var(--text-muted);
-    font-family: "SFMono-Regular","Consolas",monospace; font-size: 0.84rem; font-weight: 600;
+    font-family: "SFMono-Regular","Consolas",monospace; font-size: 0.82rem; font-weight: 600; transition: background .12s, color .12s; gap: 1px;
   }
+  .token-group .affix:hover { background: var(--surface-200); color: var(--primary); }
   .token-group .affix.l { border-right: none; border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
   .token-group .affix.r { border-left: none; border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-  .token-group input { flex: 1; min-width: 80px; border-radius: 0 !important; }
-  /* affixes are clickable: pick the wrapper style */
-  .affix { cursor: pointer; user-select: none; transition: background .12s, color .12s; gap: 1px; }
-  .affix:hover { background: var(--surface-200); color: var(--primary); }
+  .token-group input { flex: 1; min-width: 50px; border-radius: 0 !important; }
   .affix .wm-caret { opacity: .45; margin-left: 1px; }
   .affix:hover .wm-caret { opacity: .8; }
-  .wrap-menu {
-    position: fixed; z-index: 100; background: #fff; border: 1px solid var(--surface-border);
-    border-radius: 9px; box-shadow: var(--shadow-pop); padding: 0.3rem; min-width: 190px;
-  }
+
+  .wrap-menu { position: fixed; z-index: 100; background: #fff; border: 1px solid var(--surface-border); border-radius: 9px; box-shadow: var(--shadow-pop); padding: 0.3rem; min-width: 190px; }
   .wrap-menu .wm-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 0.35rem 0.55rem 0.25rem; font-weight: 700; }
-  .wrap-menu button {
-    display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 0.8rem;
-    border: none; background: transparent; cursor: pointer; padding: 0.45rem 0.55rem; border-radius: 6px;
-    font-family: inherit; font-size: 0.82rem; color: var(--text-color); text-align: left;
-  }
+  .wrap-menu button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 0.8rem; border: none; background: transparent; cursor: pointer; padding: 0.4rem 0.55rem; border-radius: 6px; font-family: inherit; font-size: 0.82rem; color: var(--text-color); text-align: left; }
   .wrap-menu button:hover { background: var(--surface-hover); }
   .wrap-menu button.active { background: var(--primary-50); color: var(--primary); font-weight: 600; }
   .wrap-menu .ex { font-family: "SFMono-Regular","Consolas",monospace; color: var(--text-secondary); }
   .wrap-menu button.active .ex { color: var(--primary); }
-  .count-pill {
-    font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);
-    background: var(--surface-hover); border: 1px solid var(--surface-border);
-    border-radius: 999px; padding: 0.1rem 0.5rem;
-  }
-  .center { text-align: center; }
-  .switch { position: relative; display: inline-block; width: 36px; height: 20px; cursor: pointer; }
-  .switch input { opacity: 0; width: 0; height: 0; }
-  .switch .track { position: absolute; inset: 0; background: #cbd5e1; border-radius: 999px; transition: .2s; }
-  .switch .track:before { content:""; position: absolute; height: 14px; width: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
-  .switch input:checked + .track { background: var(--primary); }
-  .switch input:checked + .track:before { transform: translateX(16px); }
 
-  /* order / reorder controls */
-  .order-cell { white-space: nowrap; }
-  .order-cell .ord {
-    padding: 0.05rem 0.15rem; line-height: 0.8; font-size: 0.6rem; color: var(--text-muted);
-    border: none; background: transparent; cursor: pointer; border-radius: 4px;
-  }
-  .order-cell .ord:hover:not(:disabled) { color: var(--primary); background: var(--surface-hover); }
-  .order-cell .ord:disabled { opacity: .25; cursor: default; }
-  .ord-num { font-size: 0.74rem; font-weight: 700; color: var(--text-secondary); margin: 0 0.1rem; }
+  /* add-custom form */
+  .addbox { flex: 0 0 auto; border-top: 1px solid var(--surface-border); padding-top: 0.6rem; margin-top: 0.5rem; }
+  .addbox .row { display: flex; gap: 0.4rem; margin-bottom: 0.4rem; }
+  .addbox .row.opts { font-size: 0.74rem; color: var(--text-secondary); align-items: center; }
 
-  .footer {
-    text-align: center; color: var(--text-muted); font-size: 0.78rem;
-    padding: 2rem 1rem 0.5rem; line-height: 1.7;
-  }
+  /* pager */
+  .pager { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding-top: 0.5rem; font-size: 0.78rem; color: var(--text-secondary); }
+  .pager button { border: 1px solid var(--surface-border); background: #fff; border-radius: 6px; cursor: pointer; padding: 0.2rem 0.5rem; font-family: inherit; color: var(--text-color); }
+  .pager button:disabled { opacity: .4; cursor: default; }
+
+  .empty { text-align: center; color: var(--text-muted); padding: 1.6rem 1rem; font-size: 0.84rem; }
+  .empty svg { display: block; margin: 0 auto 0.5rem; opacity: .4; }
+
+  .stat-row { flex: 0 0 auto; display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.5rem; }
+  .stat-row b { color: var(--text-color); }
+  .char-count { font-size: 0.74rem; color: var(--text-muted); transition: color .15s; margin-left: auto; }
+  .char-count.warn { color: var(--amber); font-weight: 600; }
+  .char-count.at-limit { color: var(--danger); font-weight: 700; }
+  .below { flex: 0 0 auto; display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+
+  .footer { flex: 0 0 auto; text-align: center; color: var(--text-muted); font-size: 0.74rem; padding: 0.45rem 1rem; border-top: 1px solid var(--surface-border); background: var(--surface-card); }
   .footer a { color: var(--text-secondary); text-decoration: none; }
   .footer a:hover { text-decoration: underline; color: var(--primary); }
-  .footer .sep { margin: 0 0.45rem; opacity: .45; }
+  .footer .sep { margin: 0 0.4rem; opacity: .45; }
 
-  .empty {
-    text-align: center; color: var(--text-muted); padding: 2.2rem 1rem; font-size: 0.86rem;
-  }
-  .empty svg { display: block; margin: 0 auto 0.6rem; opacity: .4; }
-  .more-note { text-align: center; color: var(--text-secondary); font-style: italic; font-size: 0.8rem; background: var(--surface-hover); padding: 0.7rem; }
-
-  /* ---------- Add custom form ---------- */
-  .addrow {
-    display: grid; grid-template-columns: 1.4fr 1fr auto auto auto; gap: 0.55rem;
-    align-items: center; padding: 0.8rem; background: var(--surface-hover);
-    border: 1px dashed var(--surface-border); border-radius: var(--radius-sm); margin-top: 0.9rem;
-  }
-  @media (max-width: 720px) { .addrow { grid-template-columns: 1fr 1fr; } }
-  .check { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; color: var(--text-secondary); cursor: pointer; white-space: nowrap; user-select: none; }
-  .check input { accent-color: var(--primary); width: 15px; height: 15px; }
-
-  .stat-row { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.7rem; }
-  .stat-row b { color: var(--text-color); }
-  .char-count { font-size: 0.74rem; color: var(--text-muted); transition: color .15s; }
-  .char-count.warn { color: #d97706; font-weight: 600; }
-  .char-count.at-limit { color: var(--danger); font-weight: 700; }
-  .toast {
-    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: #1e293b; color: #fff; padding: 0.65rem 1.1rem; border-radius: 8px;
-    font-size: 0.82rem; box-shadow: var(--shadow-pop); opacity: 0; pointer-events: none;
-    transition: opacity .2s, transform .2s; z-index: 50;
-  }
+  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(20px); background: #1e293b; color: #fff; padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.8rem; box-shadow: var(--shadow-pop); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 200; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .section-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin: 0 0 0.5rem; }
+
+  /* modal */
+  .overlay { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: none; align-items: center; justify-content: center; z-index: 150; }
+  .overlay.show { display: flex; }
+  .modal { background: #fff; border-radius: 10px; box-shadow: var(--shadow-pop); width: min(560px, 92vw); padding: 1.1rem; }
+  .modal h3 { margin: 0 0 0.3rem; font-size: 1rem; }
+  .modal p { margin: 0 0 0.7rem; font-size: 0.82rem; color: var(--text-secondary); }
+  .modal textarea { height: 220px; }
+  .modal .actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.8rem; }
+
+  @media (max-width: 1100px) {
+    body { height: auto; min-height: 100vh; overflow: auto; }
+    .workspace { flex-direction: column; overflow: visible; }
+    .panes { flex-direction: column; }
+    .pane, .sidebar { width: auto; flex: none; }
+    .pane textarea { min-height: 260px; }
+    .var-scroll { max-height: 60vh; }
+  }
 </style>
 </head>
 <body>
@@ -278,104 +272,109 @@
     </div>
     <div>
       <h1>Framewerx Data Anonymizer</h1>
-      <div class="sub">Detect &amp; redact PII before sending text to AI agents</div>
+      <div class="sub">Detect &amp; redact PII before AI — then rehydrate the response</div>
     </div>
     <div class="spacer"></div>
+    <div class="seg" id="modeSeg">
+      <button data-mode="redact" class="active" title="Detect &amp; replace PII with tokens">Redact</button>
+      <button data-mode="rehydrate" title="Replace tokens back with original values">Rehydrate</button>
+    </div>
     <span class="badge-local">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      100% local · nothing leaves this page
+      100% local
     </span>
   </div>
 
-  <div class="container">
-    <!-- Detector toggles -->
-    <div class="card" style="margin-bottom:1.25rem;">
-      <div class="card-body" style="padding:0.8rem 1.1rem; display:flex; align-items:center; gap:0.9rem; flex-wrap:wrap;">
-        <span class="section-label" style="margin:0;">Detectors</span>
-        <div class="chips" id="detectorChips"></div>
-      </div>
-    </div>
+  <div class="subbar">
+    <span class="section-label" id="detLabel">Detectors</span>
+    <div class="chips" id="detectorChips"></div>
+    <button class="btn subtle sm" id="allBtn">All</button>
+    <button class="btn subtle sm" id="noneBtn">None</button>
+    <span class="spacer"></span>
+    <span class="direction" id="direction"></span>
+  </div>
 
-    <div class="grid">
+  <div class="banner">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+    <span><b>This is not a perfect system.</b> Always review the output for missed or mis-tagged data before sharing it.</span>
+  </div>
+
+  <div class="workspace">
+    <div class="panes">
       <!-- INPUT -->
-      <div class="card">
+      <div class="card pane">
         <div class="card-header">
-          <h2>Input</h2>
-          <span class="hint">paste logs or any text</span>
+          <h2 id="inputTitle">Input</h2>
+          <span class="hint" id="inputHint">paste logs or any text</span>
           <span class="spacer"></span>
           <button class="btn subtle sm" id="sampleBtn">Load sample</button>
           <button class="btn subtle sm" id="clearBtn">Clear</button>
         </div>
         <div class="card-body">
           <textarea id="input" placeholder="Paste text here. Detection runs automatically as you type…"></textarea>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem;">
-            <button class="btn outlined sm" id="addSelectionBtn" title="Select text above, then click to add it as a variable">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-              Add selection as variable
+          <div class="below">
+            <button class="btn outlined sm" id="addSelectionInBtn" title="Select text above, then click to add it as a variable">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              Add selection
             </button>
-            <span class="char-count" id="inputCount">0 chars</span>
+            <span class="char-count" id="inputCount"></span>
           </div>
         </div>
       </div>
 
       <!-- OUTPUT -->
-      <div class="card">
+      <div class="card pane">
         <div class="card-header">
-          <h2>Sanitized output</h2>
+          <h2 id="outputTitle">Sanitized output</h2>
           <span class="spacer"></span>
-          <button class="btn outlined sm" id="copyMapBtn" title="Copy the value→token mapping as JSON">Copy mapping</button>
+          <button class="btn outlined sm" id="addSelectionOutBtn" title="Select still-raw text in the output and add it as a variable">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Add selection
+          </button>
           <button class="btn sm" id="copyOutBtn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             Copy
           </button>
         </div>
         <div class="card-body">
-          <textarea id="output" readonly placeholder="Sanitized text appears here."></textarea>
+          <textarea id="output" readonly placeholder="Output appears here."></textarea>
           <div class="stat-row" id="stats"></div>
         </div>
       </div>
     </div>
 
-    <!-- VARIABLES -->
-    <div class="card" style="margin-top:1.25rem;">
+    <!-- SIDEBAR: variables -->
+    <div class="card sidebar">
       <div class="card-header">
         <h2>Variables</h2>
-        <span class="hint" id="varHint">reorder to resolve conflicts (top wins) · rename · toggle · remove</span>
+        <span class="hint" id="varHint">reorder · rename · toggle · remove</span>
         <span class="spacer"></span>
         <span class="count-pill" id="varCount">0</span>
       </div>
       <div class="card-body">
-        <div class="tbl-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:58px;" class="center" title="Order — variables higher in the list win conflicts">Order</th>
-                <th style="width:42px;" class="center">On</th>
-                <th>Original value</th>
-                <th style="width:55px;" class="center">Count</th>
-                <th>Type</th>
-                <th>Replacement token</th>
-                <th style="width:70px;" class="center" title="Match whole words only">Whole<br>word</th>
-                <th style="width:70px;" class="center" title="Case-insensitive match">Ignore<br>case</th>
-                <th style="width:44px;"></th>
-              </tr>
-            </thead>
-            <tbody id="varBody"></tbody>
-          </table>
+        <div class="row" style="display:flex; gap:0.4rem; margin-bottom:0.5rem; flex:0 0 auto;">
+          <button class="btn subtle sm" id="copyMapBtn" title="Copy the token→value mapping as JSON" style="flex:1;">Copy mapping</button>
+          <button class="btn subtle sm" id="importMapBtn" title="Paste a mapping JSON to rehydrate with" style="flex:1;">Import mapping</button>
         </div>
-        <div id="emptyState" class="empty" style="display:none;">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-          No variables yet. Paste text above, or add a custom one below.
+        <div class="var-scroll" id="varScroll">
+          <div id="varList"></div>
+          <div id="emptyState" class="empty" style="display:none;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+            <span id="emptyText">No variables yet. Paste text, or add one below.</span>
+          </div>
         </div>
-
-        <!-- Add custom -->
-        <p class="section-label" style="margin-top:1.2rem;">Add a custom variable</p>
-        <div class="addrow">
-          <input type="text" class="sm" id="customValue" placeholder="Text to find (e.g. a name)" />
-          <div class="token-group"><span class="affix l" title="Click to change wrapper style"><span class="ch">[</span></span><input type="text" class="sm" id="customToken" placeholder="Token name (e.g. Name)" /><span class="affix r" title="Click to change wrapper style"><span class="ch">]</span><svg class="wm-caret" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
-          <label class="check"><input type="checkbox" id="customWhole" checked /> Whole word</label>
-          <label class="check"><input type="checkbox" id="customCase" checked /> Ignore case</label>
-          <button class="btn sm" id="addCustomBtn">Add</button>
+        <div class="pager" id="pager"></div>
+        <div class="addbox" id="addBox">
+          <div class="row">
+            <input type="text" class="sm" id="customValue" placeholder="Text to find (e.g. a name)" style="flex:1.3;" />
+            <div class="token-group"><span class="affix l" title="Click to change wrapper style"><span class="ch">[</span></span><input type="text" class="sm" id="customToken" placeholder="Token" /><span class="affix r" title="Click to change wrapper style"><span class="ch">]</span><svg class="wm-caret" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+          </div>
+          <div class="row opts">
+            <label class="check"><input type="checkbox" id="customWhole" checked /> Whole word</label>
+            <label class="check"><input type="checkbox" id="customCase" checked /> Ignore case</label>
+            <span class="spacer" style="flex:1;"></span>
+            <button class="btn sm" id="addCustomBtn">Add to top</button>
+          </div>
         </div>
       </div>
     </div>
@@ -383,43 +382,55 @@
 
   <footer class="footer">
     &copy; <span id="year">2026</span> Framewerx Inc. &middot; Framewerx Data Anonymizer
-    <span class="sep">&bull;</span> Runs entirely in your browser &mdash; nothing is uploaded
+    <span class="sep">&bull;</span> Runs entirely in your browser
     <span class="sep">&bull;</span> <a href="https://github.com/Framewerx/data-anonymizer" target="_blank" rel="noopener">Source</a>
   </footer>
 
   <div class="toast" id="toast"></div>
 
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <h3>Import mapping</h3>
+      <p>Paste a <code>{ "[Token]": "original value" }</code> JSON mapping (e.g. one you copied during redaction). Entries are added as variables you can rehydrate with.</p>
+      <textarea id="importText" placeholder='{\n  "[UserEmail1]": "jane.doe@example.com"\n}'></textarea>
+      <div class="actions">
+        <button class="btn subtle" id="importCancel">Cancel</button>
+        <button class="btn" id="importLoad">Load mapping</button>
+      </div>
+    </div>
+  </div>
+
 <script>
 "use strict";
 /* ============================================================
-   Data Anonymizer — fully client-side PII detection + redaction
+   Framewerx Data Anonymizer — fully client-side PII tooling
+   Redact (value→token) and Rehydrate (token→value) directions.
    ============================================================ */
 
 // ---- helpers --------------------------------------------------
 const $ = (id) => document.getElementById(id);
 function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
-function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 
-// Input cap. ~100k chars ≈ 100 KB ≈ ~1,500 log lines ≈ ~25k tokens — generous for an MSP
-// ticket/log excerpt while keeping detection + redaction responsive. Adjust freely.
+// Input cap. ~100k chars ≈ 100 KB ≈ ~1,500 log lines ≈ ~25k tokens. Adjust freely.
 const MAX_CHARS = 100000;
-// Cap how many variable rows we render to the DOM. Redaction still covers ALL detected
-// variables — only the editable table is truncated, so a huge paste can't spawn thousands
-// of rows and stall the page.
-const MAX_DISPLAY_VARS = 300;
+const PAGE_SIZE = 25; // variables per page in the sidebar
 
-// ---- detector definitions ------------------------------------
-// priority: lower = wins overlaps. color used for type tag.
+// ---- detector types (chip order = display order) -------------
 const TYPES = {
-  UserEmail:  { label: "Email",       token: "UserEmail",  color: "#3b82f6", priority: 1 },
-  MacAddress: { label: "MAC",         token: "MacAddress", color: "#8b5cf6", priority: 2 },
-  IPAddress:  { label: "IP",          token: "IPAddress",  color: "#0ea5e9", priority: 3 },
-  UUID:       { label: "UUID / ID",   token: "UUID",       color: "#14b8a6", priority: 4 },
-  NumericID:  { label: "Numeric ID",  token: "NumericID",  color: "#f59e0b", priority: 5 },
-  ServerName: { label: "Server/Host", token: "ServerName", color: "#ec4899", priority: 6, heuristic: true },
-  Name:       { label: "Name",        token: "Name",       color: "#10b981", priority: 7, heuristic: true },
-  Custom:     { label: "Custom",      token: "Var",        color: "#64748b", priority: 0 },
+  UserEmail:  { label: "Email",       token: "UserEmail",  color: "#3b82f6" },
+  Name:       { label: "Name",        token: "Name",       color: "#10b981", heuristic: true },
+  Phone:      { label: "Phone",       token: "Phone",      color: "#f97316" },
+  Address:    { label: "Address",     token: "Address",    color: "#d946ef", heuristic: true },
+  Website:    { label: "Website",     token: "Website",    color: "#6366f1" },
+  IPAddress:  { label: "IP",          token: "IPAddress",  color: "#0ea5e9" },
+  MacAddress: { label: "MAC",         token: "MacAddress", color: "#8b5cf6" },
+  UUID:       { label: "UUID / ID",   token: "UUID",       color: "#14b8a6" },
+  NumericID:  { label: "Numeric ID",  token: "NumericID",  color: "#f59e0b" },
+  ServerName: { label: "Server/Host", token: "ServerName", color: "#ec4899", heuristic: true },
+  Attachment: { label: "Attachment",  token: "Attachment", color: "#0891b2" },
+  Custom:     { label: "Custom",      token: "Var",        color: "#64748b" },
 };
 
 function matchAll(text, re) {
@@ -431,26 +442,70 @@ function matchAll(text, re) {
   return out;
 }
 
+// File extensions that look like domains but aren't websites.
+const FILE_EXT = new Set(("png jpg jpeg gif bmp svg webp ico txt log csv tsv json xml html htm " +
+  "pdf doc docx xls xlsx ppt pptx zip tar gz rar 7z exe dll dat tmp bak md yml yaml ini cfg conf " +
+  "sh bat ps1 py js ts jsx tsx css scss php rb go rs c cpp h class jar war key pem crt").split(" "));
+
 const REGEX_DETECTORS = [
-  { type: "UserEmail",  fn: t => matchAll(t, /[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g) },
+  { type: "UserEmail", fn: t => matchAll(t, /[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g) },
+
+  // Website / URL: optional scheme, one or more subdomains, a TLD that isn't a file extension.
+  { type: "Website", skipOccupied: true, fn: t => {
+      const re = /\b(?:https?:\/\/)?(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+([a-z]{2,})(?::\d{2,5})?(?:\/[^\s)<>"']*)?/gi;
+      const out = [];
+      for (const m of t.matchAll(re)) {
+        const tld = m[1].toLowerCase();
+        const hasScheme = /^https?:\/\//i.test(m[0]);
+        // reject bare filenames (e.g. image000.png) unless an explicit scheme/path is present
+        if (!hasScheme && !m[0].includes("/") && FILE_EXT.has(tld)) continue;
+        let val = m[0].replace(/[.,;:)\]]+$/, ""); // trim trailing punctuation
+        out.push({ value: val, start: m.index, end: m.index + val.length });
+      }
+      return out;
+  }},
+
+  // Attachment / inline content-id references, e.g. [cid:image001.png@01D9...]
+  { type: "Attachment", fn: t => matchAll(t, /\[?cid:[^\]\s>]+\]?/gi) },
+
   { type: "MacAddress", fn: t => matchAll(t, /\b(?:[0-9A-Fa-f]{2}[:\-]){5}[0-9A-Fa-f]{2}\b/g) },
   { type: "IPAddress",  fn: t => matchAll(t, /\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b/g) },
-  // UUID: standard 8-4-4-4-12 OR loose hyphenated alphanumeric token (must contain a digit)
-  { type: "UUID", fn: t => {
+
+  // Phone: optional +1, area code (optional parens), separators of space/dot/dash or URL-encoded %20.
+  { type: "Phone", fn: t => matchAll(t, /(?<![\d\w])(?:\+?1(?:[ \t.\-]|%20)?)?\(?\d{3}\)?(?:[ \t.\-]|%20)*\d{3}(?:[ \t.\-]|%20)*\d{4}(?!\d)/g) },
+
+  // UUID: standard 8-4-4-4-12 OR loose hyphenated alphanumeric token (needs BOTH a digit and a
+  // letter, so all-digit groups like a phone's 555-0137 aren't mistaken for an ID).
+  { type: "UUID", skipOccupied: true, fn: t => {
       const std = /\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b/g;
       const loose = /\b[0-9a-zA-Z]{3,}(?:-[0-9a-zA-Z]{3,})+\b/g;
       const res = matchAll(t, std);
       for (const m of matchAll(t, loose)) {
-        if (/\d/.test(m.value) && !res.some(r => r.start === m.start)) res.push(m);
+        if (/\d/.test(m.value) && /[a-zA-Z]/.test(m.value) && !res.some(r => r.start === m.start)) res.push(m);
       }
       return res;
   }},
-  // 4+ digit run, but not when it's part of a hyphenated/word token (e.g. the 1137 in DS-1137)
-  { type: "NumericID",  fn: t => matchAll(t, /(?<![\w-])\d{4,}(?![\w-])/g) },
-  // Server/host: capture the token following a host keyword
+
+  // Physical address (heuristic): number + words + street suffix, with optional unit / city / ST / ZIP.
+  // Inter-part whitespace is flexible and may cross a single line break (handles multi-line addresses).
+  { type: "Address", heuristic: true, fn: t => {
+      const ST = "(?:Street|St|Avenue|Ave|Road|Rd|Boulevard|Blvd|Lane|Ln|Drive|Dr|Court|Ct|Way|Place|Pl|Terrace|Ter|Circle|Cir|Square|Sq|Highway|Hwy|Parkway|Pkwy|Trail|Trl|Crescent|Cres)";
+      const SEP = "[ \\t]*(?:,|\\r?\\n)?[ \\t]*"; // spaces/tabs, optionally one line break
+      const re = new RegExp(
+        "\\b\\d{1,6}[ \\t]+(?:[A-Za-z0-9.'\\-]+[ \\t]+){1,4}" + ST + "\\b\\.?" +
+        "(?:" + SEP + "(?:#|Apt\\.?|Suite|Ste\\.?|Unit|Bldg\\.?|Floor|Fl\\.?)[ \\t]*[\\w\\-]+)?" +
+        "(?:" + SEP + "[A-Z][A-Za-z.'\\-]+(?:[ \\t]+[A-Z][A-Za-z.'\\-]+){0,2})?" +   // city
+        "(?:" + SEP + "[A-Z]{2})?" +                                                  // state
+        "(?:" + SEP + "\\d{5}(?:-\\d{4})?)?",                                         // zip
+        "g"
+      );
+      return matchAll(t, re).map(m => ({ ...m, value: m.value.replace(/\s+/g, " ").trim() }));
+  }},
+
+  // Server/host: token following a host keyword
   { type: "ServerName", fn: t => {
       const out = [];
-      const re = /\b(?:server|servers|host|hostname|node|machine|instance|vm|box)s?\s+([A-Za-z][A-Za-z0-9._\-]{0,})/gi;
+      const re = /\b(?:server|servers|host|hostname|node|machine|instance|vm|box)s?\s+([A-Za-z][A-Za-z0-9._\-]{1,})/gi;
       for (const m of t.matchAll(re)) {
         const g = m[1];
         if (!g || g.length < 2) continue;
@@ -459,25 +514,38 @@ const REGEX_DETECTORS = [
       }
       return out;
   }},
-  // Names following a label. Supports FirstName / First Name / FirstName: / First Name:
-  // and the same for LastName and Username, plus GivenName / Surname / FullName. The strong
-  // name-field labels accept a ':'/'=' OR a plain space; weaker labels (name/user/customer/…)
-  // require a ':'/'='. With an explicit ':'/'=' the value may be any case (e.g.
-  // "Username: obiwan"); with only a space the value must be Capitalized (so a phrase like
-  // "First name is required" is ignored). Captured names are redacted everywhere they appear.
-  { type: "Name", fn: t => {
+
+  // 4+ digit run, not part of a hyphen/word token, with a light "date anti-parser" so a
+  // 4-digit year in a date context isn't flagged as an ID.
+  { type: "NumericID", skipOccupied: true, fn: t => {
+      const out = [];
+      const MONTH = /(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?,?[ \t]*$/i;
+      for (const m of matchAll(t, /(?<![\w\-])\d{4,}(?![\w\-])/g)) {
+        if (m.value.length === 4) {
+          const n = +m.value, before = t.slice(Math.max(0, m.start - 18), m.start), after = t.slice(m.end, m.end + 2);
+          const yearish = n >= 1900 && n <= 2099;
+          const dateCtx = MONTH.test(before) || /[\/\-][ \t]*$/.test(before) ||
+                          /\b\d{1,2}(?:st|nd|rd|th)?,?[ \t]*$/.test(before) || /^[\/\-]\d/.test(after);
+          if (yearish && dateCtx) continue;
+        }
+        out.push(m);
+      }
+      return out;
+  }},
+
+  // Names following a label (FirstName / First Name / FirstName: / Username: …). Two consecutive
+  // capitalized words are captured as ONE name. Skips matches inside an email's span.
+  { type: "Name", skipOccupied: true, fn: t => {
       const out = [];
       const re = /\b(?:(first|last|given|sur|full|user)[ \t_-]?name|name|user|customer|client|employee|contact|owner|assigned to)\b([ \t]*[:=][ \t]*|[ \t]+)([A-Za-z][A-Za-z'’.\-]*)(?:([ \t]+)([A-Za-z][A-Za-z'’.\-]*))?/gi;
       for (const m of t.matchAll(re)) {
-        const isStrong = !!m[1];
-        const hasColon = /[:=]/.test(m[2]);
-        const w1 = m[3];
+        const isStrong = !!m[1], hasColon = /[:=]/.test(m[2]), w1 = m[3];
         if (!hasColon) {
-          if (!isStrong) continue;          // weak labels require an explicit : or =
-          if (!/^[A-Z]/.test(w1)) continue; // bare-space labels need a Capitalized value
+          if (!isStrong) continue;
+          if (!/^[A-Z]/.test(w1)) continue;
         }
         let value = w1;
-        if (m[5] && /^[A-Z]/.test(m[5])) value = w1 + m[4] + m[5]; // add 2nd word only if Capitalized
+        if (m[5] && /^[A-Z]/.test(m[5])) value = w1 + m[4] + m[5];
         const tail = m[3] + (m[4] || "") + (m[5] || "");
         const start = m.index + m[0].length - tail.length;
         out.push({ value, start, end: start + value.length });
@@ -486,28 +554,45 @@ const REGEX_DETECTORS = [
   }},
 ];
 
-// Names derived from detected emails (e.g. jane.doe@ -> jane, doe)
+// Names derived from detected emails. first.last@ → the full "First Last" phrase (one variable),
+// PLUS any standalone part (e.g. just "Vader") that appears outside the full-name occurrences.
+// Full names are ranked just ahead of their parts so they win the overlap.
 function deriveNames(text, emailOccs) {
   const out = [];
   const seen = new Set();
   const emailSpans = emailOccs.map(o => [o.start, o.end]);
   const inEmail = (i) => emailSpans.some(([s, e]) => i >= s && i < e);
-  const bases = new Set();
   for (const o of emailOccs) {
     const local = o.value.split("@")[0];
-    for (const part of local.split(/[._\-+0-9]+/)) {
-      if (part.length >= 2 && /[A-Za-z]/.test(part)) bases.add(part.toLowerCase());
+    const parts = local.split(/[._\-+0-9]+/).filter(p => p.length >= 2 && /[A-Za-z]/.test(p));
+    if (!parts.length) continue;
+    const local_out = [];
+    const fullSpans = [];
+    if (parts.length >= 2) {
+      const phrase = new RegExp("\\b" + parts.map(escapeRe).join("[ \\t]+") + "\\b", "gi");
+      for (const m of text.matchAll(phrase)) {
+        if (inEmail(m.index)) continue;
+        fullSpans.push([m.index, m.index + m[0].length]);
+        const key = m[0].toLowerCase();
+        if (!seen.has(key)) { seen.add(key); local_out.push({ value: m[0], start: m.index, full: true }); }
+      }
     }
-  }
-  for (const base of bases) {
-    const re = new RegExp("\\b" + escapeRe(base) + "\\b", "gi");
-    let firstStandalone = -1;
-    for (const m of text.matchAll(re)) {
-      if (!inEmail(m.index)) { firstStandalone = m.index; break; }
+    const inFull = (i) => fullSpans.some(([s, e]) => i >= s && i < e);
+    for (const part of parts) {
+      const base = part.toLowerCase();
+      if (seen.has(base)) continue;
+      const re = new RegExp("\\b" + escapeRe(base) + "\\b", "gi");
+      for (const m of text.matchAll(re)) {
+        if (inEmail(m.index) || inFull(m.index)) continue;
+        seen.add(base); local_out.push({ value: m[0], start: m.index, full: false }); break;
+      }
     }
-    if (firstStandalone >= 0 && !seen.has(base)) {
-      seen.add(base);
-      out.push({ value: base, start: firstStandalone, end: firstStandalone + base.length });
+    if (!local_out.length) continue;
+    // Rank full names at the earliest position so they sit above their parts in list order.
+    const minStart = Math.min(...local_out.map(e => e.start));
+    for (const e of local_out) {
+      const start = e.full ? minStart : e.start;
+      out.push({ value: e.value, start, end: start + e.value.length });
     }
   }
   return out;
@@ -518,14 +603,18 @@ function detect(text) {
   const claimed = new Set();
   const found = [];
   let emailOccs = [];
+  // Spans already taken by earlier (higher-priority) detectors. A detector flagged
+  // `skipOccupied` won't grab a match sitting inside one of these — so a number inside a URL
+  // or a digit-group inside a phone number doesn't spawn its own spurious variable.
+  const occupied = [];
+  const overlapsOcc = (s, e) => occupied.some(([a, b]) => s < b && e > a);
   for (const d of REGEX_DETECTORS) {
-    if (state.disabledTypes.has(d.type)) {
-      if (d.type === "UserEmail") emailOccs = []; // names depend on emails
-      continue;
-    }
+    if (state.disabledTypes.has(d.type)) continue;
     const occs = d.fn(text);
     if (d.type === "UserEmail") emailOccs = occs;
     for (const o of occs) {
+      if (d.skipOccupied && overlapsOcc(o.start, o.end)) continue;
+      occupied.push([o.start, o.end]);
       if (claimed.has(o.value)) continue;
       claimed.add(o.value);
       found.push({ value: o.value, type: d.type, first: o.start });
@@ -542,7 +631,6 @@ function detect(text) {
 }
 
 // ---- wrapper styles ------------------------------------------
-// Brackets are applied automatically; the affix is clickable to switch style.
 const WRAPPERS = [
   { label: "Square",       open: "[",  close: "]" },
   { label: "Curly",        open: "{",  close: "}" },
@@ -558,11 +646,14 @@ function wrap(token) { return state.wrapper.open + token + state.wrapper.close; 
 
 // ---- application state ---------------------------------------
 const state = {
-  text: "",
-  variables: [],            // {id,value,token,type,enabled,wholeWord,ignoreCase,source,tokenEdited}
-  dismissed: new Set(),     // auto-detected values the user removed
-  disabledTypes: new Set(), // detector types switched off
-  wrapper: WRAPPERS[0],     // token wrapper style
+  mode: "redact",           // 'redact' | 'rehydrate'
+  text: "",                 // redact-mode input
+  rehydrateText: "",        // rehydrate-mode input
+  variables: [],
+  dismissed: new Set(),
+  disabledTypes: new Set(),
+  wrapper: WRAPPERS[0],
+  page: 0,
 };
 let nextId = 1;
 
@@ -570,6 +661,9 @@ const DEFAULT_FLAGS = {
   Name:       { wholeWord: true,  ignoreCase: true },
   ServerName: { wholeWord: true,  ignoreCase: false },
   NumericID:  { wholeWord: true,  ignoreCase: false },
+  Phone:      { wholeWord: false, ignoreCase: false },
+  Address:    { wholeWord: false, ignoreCase: true },
+  Website:    { wholeWord: false, ignoreCase: true },
 };
 function makeVar(f) {
   const flags = DEFAULT_FLAGS[f.type] || { wholeWord: false, ignoreCase: false };
@@ -583,8 +677,6 @@ function makeVar(f) {
 function reanalyze() {
   const found = detect(state.text).filter(f => !state.dismissed.has(f.value));
   const foundByVal = new Map(found.map(f => [f.value, f]));
-  // Keep existing variables in their current (possibly user-sorted) order so manual
-  // reordering survives re-scans. Drop auto variables whose value is gone; keep customs.
   const kept = [];
   for (const v of state.variables) {
     if (v.source === "custom") { kept.push(v); continue; }
@@ -593,7 +685,8 @@ function reanalyze() {
   }
   const existing = new Set(kept.map(v => v.value));
   const fresh = found.filter(f => !existing.has(f.value)).map(makeVar);
-  fresh.sort((a, b) => (a.first ?? 1e9) - (b.first ?? 1e9)); // new ones ordered by first appearance
+  // by first appearance; at the same position the longer value wins (full names before parts)
+  fresh.sort((a, b) => ((a.first ?? 1e9) - (b.first ?? 1e9)) || (b.value.length - a.value.length));
   state.variables = kept.concat(fresh);
   assignTokens(state.variables);
 }
@@ -609,7 +702,7 @@ function assignTokens(vars) {
   }
 }
 
-// ---- sanitize -------------------------------------------------
+// ---- transforms ----------------------------------------------
 function buildRegex(v) {
   let p = escapeRe(v.value);
   if (v.wholeWord) {
@@ -619,45 +712,55 @@ function buildRegex(v) {
   return new RegExp(p, "g" + (v.ignoreCase ? "i" : ""));
 }
 
+// REDACT: value → token. Overlap-safe via an occupancy map; list order = precedence.
 function sanitize() {
   const text = state.text;
   const vars = state.variables.filter(v => v.enabled && !state.disabledTypes.has(v.type) && v.value);
   const counts = {};
-  const claimed = []; // {start, end, token, id} — claimed in list order (= precedence)
-  // Occupancy map over the original text. Apply variables top-to-bottom: an earlier
-  // (higher) variable claims its matches first, so it wins any conflict. Claiming on the
-  // original text also guarantees no double-replacement. Using a byte map keeps overlap
-  // checks linear (O(text length)) instead of O(matches²), which is what froze the tab.
+  const claimed = [];
   const occ = new Uint8Array(text.length);
   const isFree = (s, e) => { for (let i = s; i < e; i++) if (occ[i]) return false; return true; };
   for (const v of vars) {
-    let re;
-    try { re = buildRegex(v); } catch (e) { continue; }
+    let re; try { re = buildRegex(v); } catch (e) { continue; }
     counts[v.id] = 0;
     for (const m of text.matchAll(re)) {
       if (m[0].length === 0) continue;
       const s = m.index, e = s + m[0].length;
-      if (!isFree(s, e)) continue; // region already taken by a higher-precedence variable
+      if (!isFree(s, e)) continue;
       for (let i = s; i < e; i++) occ[i] = 1;
-      claimed.push({ start: s, end: e, token: wrap(v.token), id: v.id });
+      claimed.push({ start: s, end: e, token: wrap(v.token) });
       counts[v.id]++;
     }
   }
   claimed.sort((a, b) => a.start - b.start);
   let out = "", cursor = 0, replaced = 0;
-  for (const c of claimed) {
-    out += text.slice(cursor, c.start) + c.token;
-    cursor = c.end;
-    replaced++;
-  }
+  for (const c of claimed) { out += text.slice(cursor, c.start) + c.token; cursor = c.end; replaced++; }
   out += text.slice(cursor);
   return { out, counts, replaced };
 }
 
+// REHYDRATE: token → value. Longest token first so [Name10] beats [Name1].
+function rehydrate() {
+  let text = state.rehydrateText;
+  const counts = {};
+  let replaced = 0;
+  const vars = state.variables
+    .filter(v => v.enabled && v.value && v.token)
+    .slice()
+    .sort((a, b) => wrap(b.token).length - wrap(a.token).length);
+  for (const v of vars) {
+    counts[v.id] = 0;
+    const tok = wrap(v.token);
+    const re = new RegExp(escapeRe(tok), "g");
+    text = text.replace(re, () => { counts[v.id]++; replaced++; return v.value; });
+  }
+  return { out: text, counts, replaced };
+}
+
 // ---- rendering ------------------------------------------------
 function renderChips() {
-  const wrap = $("detectorChips");
-  wrap.innerHTML = "";
+  const wrapEl = $("detectorChips");
+  wrapEl.innerHTML = "";
   for (const [type, def] of Object.entries(TYPES)) {
     if (type === "Custom") continue;
     const on = !state.disabledTypes.has(type);
@@ -670,72 +773,100 @@ function renderChips() {
       if (on) state.disabledTypes.add(type); else state.disabledTypes.delete(type);
       reanalyze(); render();
     };
-    wrap.appendChild(chip);
+    wrapEl.appendChild(chip);
   }
 }
 
-function renderVariables(counts) {
-  const body = $("varBody");
-  body.innerHTML = "";
-  const vars = state.variables;
-  $("emptyState").style.display = vars.length ? "none" : "block";
-  $("varCount").textContent = vars.length;
-
-  const shown = Math.min(vars.length, MAX_DISPLAY_VARS);
-  for (let idx = 0; idx < shown; idx++) {
-    const v = vars[idx];
-    const def = TYPES[v.type];
-    const tr = document.createElement("tr");
-    if (!v.enabled || state.disabledTypes.has(v.type)) tr.className = "disabled";
-    const cnt = counts[v.id] || 0;
-
-    const tagHeur = def.heuristic ? `<span class="tag heur" style="background:${def.color}">${def.label}<span class="mini" style="color:#fff;opacity:.85;">~</span></span>` : `<span class="tag" style="background:${def.color}">${def.label}</span>`;
-
-    tr.innerHTML = `
-      <td class="center order-cell">
+function variableCard(v, idx, count, lastIdx) {
+  const def = TYPES[v.type];
+  const card = document.createElement("div");
+  card.className = "var-card" + ((!v.enabled || state.disabledTypes.has(v.type)) ? " disabled" : "");
+  const tag = def.heuristic
+    ? `<span class="tag heur" style="background:${def.color}">${def.label} ~</span>`
+    : `<span class="tag" style="background:${def.color}">${def.label}</span>`;
+  card.innerHTML = `
+    <div class="var-row">
+      <div class="var-order">
         <button class="ord" data-act="up" ${idx === 0 ? "disabled" : ""} title="Move up — higher precedence">&#9650;</button>
         <span class="ord-num">${idx + 1}</span>
-        <button class="ord" data-act="down" ${idx === vars.length - 1 ? "disabled" : ""} title="Move down">&#9660;</button>
-      </td>
-      <td class="center">
-        <label class="switch"><input type="checkbox" data-act="toggle" ${v.enabled ? "checked" : ""}><span class="track"></span></label>
-      </td>
-      <td class="val-cell">${escapeHtml(v.value)}${v.source === "custom" ? ' <span class="mini">(custom)</span>' : ""}</td>
-      <td class="center"><span class="count-pill">${cnt}</span></td>
-      <td>${tagHeur}</td>
-      <td><div class="token-group"><span class="affix l" title="Click to change wrapper style"><span class="ch">${escapeHtml(state.wrapper.open)}</span></span><input type="text" class="sm token-input" data-act="token" value="${escapeHtml(v.token)}"><span class="affix r" title="Click to change wrapper style"><span class="ch">${escapeHtml(state.wrapper.close)}</span><svg class="wm-caret" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div></td>
-      <td class="center"><input type="checkbox" data-act="whole" ${v.wholeWord ? "checked" : ""} style="accent-color:var(--primary);width:15px;height:15px;"></td>
-      <td class="center"><input type="checkbox" data-act="case" ${v.ignoreCase ? "checked" : ""} style="accent-color:var(--primary);width:15px;height:15px;"></td>
-      <td class="center">
-        <button class="icon-btn del" data-act="del" title="Remove (not PII)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-        </button>
-      </td>`;
+        <button class="ord" data-act="down" ${idx === lastIdx ? "disabled" : ""} title="Move down">&#9660;</button>
+      </div>
+      <input type="text" class="sm value-input" data-act="value" value="${escapeHtml(v.value)}" title="Edit the matched text (becomes a custom rule)" />
+      ${tag}
+      <button class="icon-btn del" data-act="del" title="Remove (not PII)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      </button>
+    </div>
+    <div class="var-row">
+      <div class="token-group"><span class="affix l" title="Click to change wrapper style"><span class="ch">${escapeHtml(state.wrapper.open)}</span></span><input type="text" class="sm" data-act="token" value="${escapeHtml(v.token)}"><span class="affix r" title="Click to change wrapper style"><span class="ch">${escapeHtml(state.wrapper.close)}</span><svg class="wm-caret" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></div>
+      <span class="count-pill" title="${state.mode === 'redact' ? 'replacements made' : 'tokens restored'}">${count}</span>
+    </div>
+    <div class="var-row">
+      <label class="switch"><input type="checkbox" data-act="toggle" ${v.enabled ? "checked" : ""}><span class="track"></span></label>
+      <div class="flags">
+        <label class="check"><input type="checkbox" data-act="whole" ${v.wholeWord ? "checked" : ""}> Whole word</label>
+        <label class="check"><input type="checkbox" data-act="case" ${v.ignoreCase ? "checked" : ""}> Ignore case</label>
+      </div>
+    </div>`;
 
-    tr.querySelector('[data-act="up"]').onclick = () => move(v.id, -1);
-    tr.querySelector('[data-act="down"]').onclick = () => move(v.id, 1);
-    tr.querySelector('[data-act="toggle"]').onchange = e => { v.enabled = e.target.checked; render(); };
-    tr.querySelector('[data-act="whole"]').onchange = e => { v.wholeWord = e.target.checked; render(); };
-    tr.querySelector('[data-act="case"]').onchange = e => { v.ignoreCase = e.target.checked; render(); };
-    tr.querySelector('[data-act="del"]').onclick = () => {
-      if (v.source !== "custom") state.dismissed.add(v.value);
-      state.variables = state.variables.filter(x => x.id !== v.id);
-      render();
-    };
-    const ti = tr.querySelector('[data-act="token"]');
-    ti.oninput = e => {
-      const clean = e.target.value.replace(/[\[\]]/g, ""); // brackets are applied automatically
-      if (clean !== e.target.value) e.target.value = clean;
-      v.token = clean; v.tokenEdited = true; renderOutput();
-    };
-    body.appendChild(tr);
-  }
+  card.querySelector('[data-act="up"]').onclick = () => move(v.id, -1);
+  card.querySelector('[data-act="down"]').onclick = () => move(v.id, 1);
+  card.querySelector('[data-act="toggle"]').onchange = e => { v.enabled = e.target.checked; render(); };
+  card.querySelector('[data-act="whole"]').onchange = e => { v.wholeWord = e.target.checked; renderOutput(); };
+  card.querySelector('[data-act="case"]').onchange = e => { v.ignoreCase = e.target.checked; renderOutput(); };
+  card.querySelector('[data-act="del"]').onclick = () => {
+    if (v.source !== "custom") state.dismissed.add(v.value);
+    state.variables = state.variables.filter(x => x.id !== v.id);
+    render();
+  };
+  const vi = card.querySelector('[data-act="value"]');
+  vi.onchange = e => {
+    const nv = e.target.value;
+    if (!nv) { e.target.value = v.value; return; }
+    // editing the matched text turns any rule into a custom rule
+    v.value = nv; v.source = "custom"; v.type = "Custom";
+    v.first = (state.mode === "redact" ? state.text : state.rehydrateText).indexOf(nv);
+    render();
+  };
+  const ti = card.querySelector('[data-act="token"]');
+  ti.oninput = e => {
+    const clean = e.target.value.replace(/[\[\]]/g, "");
+    if (clean !== e.target.value) e.target.value = clean;
+    v.token = clean; v.tokenEdited = true; renderOutput();
+  };
+  return card;
+}
 
-  if (vars.length > shown) {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="9" class="more-note">+ ${(vars.length - shown).toLocaleString()} more variable${vars.length - shown === 1 ? "" : "s"} not shown (table capped at ${MAX_DISPLAY_VARS.toLocaleString()}) — all are still redacted in the output.</td>`;
-    body.appendChild(tr);
-  }
+function renderVariables(counts) {
+  const list = $("varList");
+  list.innerHTML = "";
+  const vars = state.variables;
+  $("varCount").textContent = vars.length;
+  $("emptyState").style.display = vars.length ? "none" : "block";
+
+  const pages = Math.max(1, Math.ceil(vars.length / PAGE_SIZE));
+  state.page = Math.min(Math.max(0, state.page), pages - 1);
+  const start = state.page * PAGE_SIZE;
+  const slice = vars.slice(start, start + PAGE_SIZE);
+  const lastIdx = vars.length - 1;
+  slice.forEach((v, k) => list.appendChild(variableCard(v, start + k, counts[v.id] || 0, lastIdx)));
+
+  renderPager(pages);
+}
+
+function renderPager(pages) {
+  const p = $("pager");
+  if (pages <= 1) { p.innerHTML = ""; return; }
+  p.innerHTML = "";
+  const prev = document.createElement("button");
+  prev.textContent = "‹ Prev"; prev.disabled = state.page === 0;
+  prev.onclick = () => { state.page--; render(); };
+  const info = document.createElement("span");
+  info.textContent = `Page ${state.page + 1} of ${pages}`;
+  const next = document.createElement("button");
+  next.textContent = "Next ›"; next.disabled = state.page >= pages - 1;
+  next.onclick = () => { state.page++; render(); };
+  p.append(prev, info, next);
 }
 
 function move(id, dir) {
@@ -749,23 +880,66 @@ function move(id, dir) {
 }
 
 function renderOutput() {
-  const { out, counts, replaced } = sanitize();
-  $("output").value = out;
-  const active = state.variables.filter(v => v.enabled && !state.disabledTypes.has(v.type)).length;
-  $("stats").innerHTML =
-    `<span><b>${active}</b> active variable${active === 1 ? "" : "s"}</span>` +
-    `<span><b>${replaced}</b> replacement${replaced === 1 ? "" : "s"} made</span>` +
-    `<span><b>${state.text.length}</b> chars in</span>`;
-  return counts;
+  const res = state.mode === "redact" ? sanitize() : rehydrate();
+  $("output").value = res.out;
+  const active = state.variables.filter(v => v.enabled && (state.mode === "rehydrate" || !state.disabledTypes.has(v.type))).length;
+  const srcLen = (state.mode === "redact" ? state.text : state.rehydrateText).length;
+  if (state.mode === "redact") {
+    $("stats").innerHTML =
+      `<span><b>${active}</b> active variable${active === 1 ? "" : "s"}</span>` +
+      `<span><b>${res.replaced}</b> replacement${res.replaced === 1 ? "" : "s"}</span>` +
+      `<span><b>${srcLen.toLocaleString()}</b> chars in</span>`;
+  } else {
+    $("stats").innerHTML =
+      `<span><b>${active}</b> mapping${active === 1 ? "" : "s"}</span>` +
+      `<span><b>${res.replaced}</b> token${res.replaced === 1 ? "" : "s"} restored</span>` +
+      `<span><b>${srcLen.toLocaleString()}</b> chars in</span>`;
+  }
+  return res.counts;
 }
 
 function render() {
   renderChips();
   const counts = renderOutput();
   renderVariables(counts);
-  // refresh wrapper affix characters everywhere (incl. custom form)
   document.querySelectorAll(".affix.l .ch").forEach(e => e.textContent = state.wrapper.open);
   document.querySelectorAll(".affix.r .ch").forEach(e => e.textContent = state.wrapper.close);
+}
+
+// ---- mode (redact / rehydrate) -------------------------------
+function updateModeUI() {
+  const redact = state.mode === "redact";
+  document.querySelectorAll("#modeSeg button").forEach(b => b.classList.toggle("active", b.dataset.mode === state.mode));
+  $("inputTitle").textContent = redact ? "Input" : "Tokenized input";
+  $("inputHint").textContent = redact ? "paste logs or any text" : "paste the AI response containing tokens";
+  $("outputTitle").textContent = redact ? "Sanitized output" : "Rehydrated output";
+  $("direction").innerHTML = redact
+    ? `Raw <span class="arrow">&#10142;</span> Redacted`
+    : `Tokens <span class="arrow">&#10142;</span> Restored`;
+  // detector controls only make sense while redacting
+  const detDisplay = redact ? "" : "none";
+  $("detLabel").style.display = detDisplay;
+  $("detectorChips").style.display = redact ? "flex" : "none";
+  $("allBtn").style.display = detDisplay;
+  $("noneBtn").style.display = detDisplay;
+  $("addSelectionOutBtn").style.display = redact ? "" : "none";
+  $("sampleBtn").style.display = redact ? "" : "none";
+}
+
+function setMode(m) {
+  if (m === state.mode) return;
+  state.mode = m;
+  if (m === "rehydrate") {
+    if (!state.rehydrateText) state.rehydrateText = sanitize().out; // seed with current redacted output
+    $("input").value = state.rehydrateText;
+    $("input").readOnly = false;
+  } else {
+    $("input").value = state.text;
+  }
+  state.page = 0;
+  updateModeUI();
+  updateCount();
+  render();
 }
 
 // ---- wrapper-style dropdown ----------------------------------
@@ -798,7 +972,7 @@ document.addEventListener("click", (e) => {
   if (wrapMenuEl && !e.target.closest(".wrap-menu")) closeWrapMenu();
 });
 window.addEventListener("resize", closeWrapMenu);
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeWrapMenu(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeWrapMenu(); closeModal(); } });
 
 // ---- events ---------------------------------------------------
 function updateCount() {
@@ -809,71 +983,118 @@ function updateCount() {
   el.classList.toggle("warn", n >= MAX_CHARS * 0.9 && n < MAX_CHARS);
 }
 
-const onInput = debounce(() => {
-  state.text = $("input").value;
-  reanalyze();
-  render();
-}, 200);
+const onInputRedact = debounce(() => { state.text = $("input").value; reanalyze(); render(); }, 200);
+const onInputRehydrate = debounce(() => { state.rehydrateText = $("input").value; render(); }, 120);
 
 $("input").addEventListener("input", () => {
   updateCount();
-  onInput();
+  if (state.mode === "redact") onInputRedact(); else onInputRehydrate();
 });
 
-$("addCustomBtn").onclick = () => {
-  const value = $("customValue").value.trim();
-  if (!value) { toast("Enter text to find"); return; }
-  let token = $("customToken").value.trim().replace(/[\[\]]/g, "");
-  if (!token) token = "Var";
-  if (state.variables.some(v => v.value === value)) { toast("That value already exists"); return; }
+// synchronized scrolling between input and output
+let syncing = false;
+function syncScroll(from, to) {
+  if (syncing) return; syncing = true;
+  const denom = Math.max(1, from.scrollHeight - from.clientHeight);
+  to.scrollTop = (from.scrollTop / denom) * Math.max(1, to.scrollHeight - to.clientHeight);
+  requestAnimationFrame(() => { syncing = false; });
+}
+$("input").addEventListener("scroll", () => syncScroll($("input"), $("output")));
+$("output").addEventListener("scroll", () => syncScroll($("output"), $("input")));
+
+document.querySelectorAll("#modeSeg button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+$("allBtn").onclick = () => { state.disabledTypes.clear(); reanalyze(); render(); };
+$("noneBtn").onclick = () => {
+  for (const t of Object.keys(TYPES)) if (t !== "Custom") state.disabledTypes.add(t);
+  reanalyze(); render();
+};
+
+function addCustom(value, focusToken) {
+  value = value.trim();
+  if (!value) { toast("Enter text to find"); return false; }
+  let token = $("customToken").value.trim().replace(/[\[\]]/g, "") || "Var";
+  if (state.variables.some(v => v.value === value)) { toast("That value already exists"); return false; }
   state.dismissed.delete(value);
-  // Add at the top: a deliberately-added custom is an override and gets the highest
-  // precedence by default. The user can reorder it down if they prefer.
   state.variables.unshift({
     id: nextId++, value, token, type: "Custom", enabled: true,
-    source: "custom", tokenEdited: true, first: state.text.indexOf(value),
+    source: "custom", tokenEdited: true,
+    first: (state.mode === "redact" ? state.text : state.rehydrateText).indexOf(value),
     wholeWord: $("customWhole").checked, ignoreCase: $("customCase").checked,
   });
   $("customValue").value = ""; $("customToken").value = "";
+  state.page = 0;
   render();
   toast("Variable added at top (highest precedence)");
-};
+  return true;
+}
+$("addCustomBtn").onclick = () => addCustom($("customValue").value);
 $("customValue").addEventListener("keydown", e => { if (e.key === "Enter") $("addCustomBtn").click(); });
 $("customToken").addEventListener("keydown", e => { if (e.key === "Enter") $("addCustomBtn").click(); });
 
-$("addSelectionBtn").onclick = () => {
-  const ta = $("input");
-  const sel = ta.value.substring(ta.selectionStart, ta.selectionEnd).trim();
-  if (!sel) { toast("Select some text in the input first"); return; }
+function addSelectionFrom(el) {
+  const sel = el.value.substring(el.selectionStart, el.selectionEnd).trim();
+  if (!sel) { toast("Select some text first"); return; }
   $("customValue").value = sel;
   $("customToken").focus();
-};
+}
+$("addSelectionInBtn").onclick = () => addSelectionFrom($("input"));
+$("addSelectionOutBtn").onclick = () => addSelectionFrom($("output"));
 
 $("sampleBtn").onclick = () => {
   $("input").value = SAMPLE;
   state.text = SAMPLE;
-  updateCount();
-  reanalyze();
-  render();
+  updateCount(); reanalyze(); render();
 };
 $("clearBtn").onclick = () => {
   $("input").value = "";
-  state.text = ""; state.variables = []; state.dismissed.clear();
-  updateCount();
-  render();
+  if (state.mode === "redact") { state.text = ""; state.variables = []; state.dismissed.clear(); }
+  else { state.rehydrateText = ""; }
+  state.page = 0;
+  updateCount(); render();
 };
 
-$("copyOutBtn").onclick = () => copy($("output").value, "Sanitized output copied");
+$("copyOutBtn").onclick = () => copy($("output").value, "Output copied");
 $("copyMapBtn").onclick = () => {
   const map = {};
   for (const v of state.variables) if (v.enabled) map[wrap(v.token)] = v.value;
+  if (!Object.keys(map).length) { toast("No mapping to copy"); return; }
   copy(JSON.stringify(map, null, 2), "Mapping copied as JSON");
+};
+
+// ---- import-mapping modal ------------------------------------
+function openModal() { $("overlay").classList.add("show"); $("importText").focus(); }
+function closeModal() { $("overlay").classList.remove("show"); }
+$("importMapBtn").onclick = openModal;
+$("importCancel").onclick = closeModal;
+$("overlay").addEventListener("click", e => { if (e.target === $("overlay")) closeModal(); });
+$("importLoad").onclick = () => {
+  let obj;
+  try { obj = JSON.parse($("importText").value); }
+  catch (e) { toast("Invalid JSON"); return; }
+  if (!obj || typeof obj !== "object") { toast("Expected a JSON object"); return; }
+  let added = 0;
+  for (const [k, val] of Object.entries(obj)) {
+    if (typeof val !== "string") continue;
+    const token = String(k).replace(/^[^\w]+|[^\w]+$/g, ""); // strip wrapper chars
+    if (state.variables.some(v => v.value === val && v.token === token)) continue;
+    state.variables.push({
+      id: nextId++, value: val, token, type: "Custom", enabled: true,
+      source: "custom", tokenEdited: true, first: 0, wholeWord: false, ignoreCase: false,
+    });
+    added++;
+  }
+  closeModal();
+  $("importText").value = "";
+  state.page = 0;
+  render();
+  toast(added ? `Imported ${added} mapping${added === 1 ? "" : "s"}` : "Nothing new to import");
+  if (added && state.mode === "redact") setMode("rehydrate");
 };
 
 function copy(text, msg) {
   if (!text) { toast("Nothing to copy"); return; }
   navigator.clipboard.writeText(text).then(() => toast(msg)).catch(() => {
-    // fallback for non-secure contexts (file://)
     const ta = document.createElement("textarea");
     ta.value = text; document.body.appendChild(ta); ta.select();
     try { document.execCommand("copy"); toast(msg); } catch (e) { toast("Copy failed"); }
@@ -886,21 +1107,25 @@ function toast(msg) {
   const t = $("toast");
   t.textContent = msg; t.classList.add("show");
   clearTimeout(toastT);
-  toastT = setTimeout(() => t.classList.remove("show"), 1800);
+  toastT = setTimeout(() => t.classList.remove("show"), 1900);
 }
 
 const SAMPLE = `darth.vader@empire.gov logged in from server DS-1137 at 12:59PM (9.2.12.33)
+Phone: (480) 555-0137 — alt 4805550199
 email (id: a7d6dfs-sdf9234-sdaf8ff) triggered to mon.mothma@thesenate.org at 14:44
-server 9.2.12.33 went down
-email (id: a7d6dfs-sdf9234-sdaf8ff) failed to send
+server 9.2.12.33 went down on 2024-03-14
 Vader is not happy about this failure on server DS-1137
-Another person involved is Han Solo
+Another person involved is Darth Vader
+Ticket portal: https://support.empire.gov/tickets/4471
 First Name: Han
-Last Name: Solo`;
+Last Name: Solo
+Mailing address: 1138 Mos Eisley Blvd, Suite 4, Tatooine, AZ 85001
+[cid:image001.png@01DA5E2F.7C3A1B40]`;
 
 // ---- init -----------------------------------------------------
 $("year").textContent = new Date().getFullYear();
 $("input").maxLength = MAX_CHARS;
+updateModeUI();
 updateCount();
 render();
 </script>

@@ -244,6 +244,7 @@
     text-align: center; color: var(--text-muted); padding: 2.2rem 1rem; font-size: 0.86rem;
   }
   .empty svg { display: block; margin: 0 auto 0.6rem; opacity: .4; }
+  .more-note { text-align: center; color: var(--text-secondary); font-style: italic; font-size: 0.8rem; background: var(--surface-hover); padding: 0.7rem; }
 
   /* ---------- Add custom form ---------- */
   .addrow {
@@ -257,7 +258,9 @@
 
   .stat-row { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.7rem; }
   .stat-row b { color: var(--text-color); }
-  .char-count { font-size: 0.74rem; color: var(--text-muted); }
+  .char-count { font-size: 0.74rem; color: var(--text-muted); transition: color .15s; }
+  .char-count.warn { color: #d97706; font-weight: 600; }
+  .char-count.at-limit { color: var(--danger); font-weight: 700; }
   .toast {
     position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(20px);
     background: #1e293b; color: #fff; padding: 0.65rem 1.1rem; border-radius: 8px;
@@ -397,6 +400,14 @@ const $ = (id) => document.getElementById(id);
 function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+// Input cap. ~100k chars ≈ 100 KB ≈ ~1,500 log lines ≈ ~25k tokens — generous for an MSP
+// ticket/log excerpt while keeping detection + redaction responsive. Adjust freely.
+const MAX_CHARS = 100000;
+// Cap how many variable rows we render to the DOM. Redaction still covers ALL detected
+// variables — only the editable table is truncated, so a huge paste can't spawn thousands
+// of rows and stall the page.
+const MAX_DISPLAY_VARS = 300;
 
 // ---- detector definitions ------------------------------------
 // priority: lower = wins overlaps. color used for type tag.
@@ -613,10 +624,12 @@ function sanitize() {
   const vars = state.variables.filter(v => v.enabled && !state.disabledTypes.has(v.type) && v.value);
   const counts = {};
   const claimed = []; // {start, end, token, id} — claimed in list order (= precedence)
-  const overlaps = (s, e) => claimed.some(c => s < c.end && e > c.start);
-  // Apply variables top-to-bottom: an earlier (higher) variable claims its matches
-  // first, so it wins any conflict. Claiming on the original text also guarantees no
-  // double-replacement.
+  // Occupancy map over the original text. Apply variables top-to-bottom: an earlier
+  // (higher) variable claims its matches first, so it wins any conflict. Claiming on the
+  // original text also guarantees no double-replacement. Using a byte map keeps overlap
+  // checks linear (O(text length)) instead of O(matches²), which is what froze the tab.
+  const occ = new Uint8Array(text.length);
+  const isFree = (s, e) => { for (let i = s; i < e; i++) if (occ[i]) return false; return true; };
   for (const v of vars) {
     let re;
     try { re = buildRegex(v); } catch (e) { continue; }
@@ -624,7 +637,8 @@ function sanitize() {
     for (const m of text.matchAll(re)) {
       if (m[0].length === 0) continue;
       const s = m.index, e = s + m[0].length;
-      if (overlaps(s, e)) continue; // region already taken by a higher-precedence variable
+      if (!isFree(s, e)) continue; // region already taken by a higher-precedence variable
+      for (let i = s; i < e; i++) occ[i] = 1;
       claimed.push({ start: s, end: e, token: wrap(v.token), id: v.id });
       counts[v.id]++;
     }
@@ -667,7 +681,8 @@ function renderVariables(counts) {
   $("emptyState").style.display = vars.length ? "none" : "block";
   $("varCount").textContent = vars.length;
 
-  for (let idx = 0; idx < vars.length; idx++) {
+  const shown = Math.min(vars.length, MAX_DISPLAY_VARS);
+  for (let idx = 0; idx < shown; idx++) {
     const v = vars[idx];
     const def = TYPES[v.type];
     const tr = document.createElement("tr");
@@ -713,6 +728,12 @@ function renderVariables(counts) {
       if (clean !== e.target.value) e.target.value = clean;
       v.token = clean; v.tokenEdited = true; renderOutput();
     };
+    body.appendChild(tr);
+  }
+
+  if (vars.length > shown) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="9" class="more-note">+ ${(vars.length - shown).toLocaleString()} more variable${vars.length - shown === 1 ? "" : "s"} not shown (table capped at ${MAX_DISPLAY_VARS.toLocaleString()}) — all are still redacted in the output.</td>`;
     body.appendChild(tr);
   }
 }
@@ -780,15 +801,22 @@ window.addEventListener("resize", closeWrapMenu);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeWrapMenu(); });
 
 // ---- events ---------------------------------------------------
+function updateCount() {
+  const n = $("input").value.length;
+  const el = $("inputCount");
+  el.textContent = n.toLocaleString() + " / " + MAX_CHARS.toLocaleString() + " chars";
+  el.classList.toggle("at-limit", n >= MAX_CHARS);
+  el.classList.toggle("warn", n >= MAX_CHARS * 0.9 && n < MAX_CHARS);
+}
+
 const onInput = debounce(() => {
   state.text = $("input").value;
-  $("inputCount").textContent = state.text.length + " chars";
   reanalyze();
   render();
 }, 200);
 
 $("input").addEventListener("input", () => {
-  $("inputCount").textContent = $("input").value.length + " chars";
+  updateCount();
   onInput();
 });
 
@@ -824,14 +852,14 @@ $("addSelectionBtn").onclick = () => {
 $("sampleBtn").onclick = () => {
   $("input").value = SAMPLE;
   state.text = SAMPLE;
-  $("inputCount").textContent = SAMPLE.length + " chars";
+  updateCount();
   reanalyze();
   render();
 };
 $("clearBtn").onclick = () => {
   $("input").value = "";
   state.text = ""; state.variables = []; state.dismissed.clear();
-  $("inputCount").textContent = "0 chars";
+  updateCount();
   render();
 };
 
@@ -872,6 +900,8 @@ Last Name: Solo`;
 
 // ---- init -----------------------------------------------------
 $("year").textContent = new Date().getFullYear();
+$("input").maxLength = MAX_CHARS;
+updateCount();
 render();
 </script>
 </body>

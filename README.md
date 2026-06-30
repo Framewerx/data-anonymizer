@@ -74,6 +74,17 @@ redacted in a sentence like "Another person involved is Han Solo".
   (`jane.doe@…` → suggests `jane`, `doe`) and only suggested when the name
   also appears standalone elsewhere in the text.
 
+## Limits
+
+- The input is capped at **100,000 characters** (~100 KB, roughly 1,500 log lines) to
+  keep detection and redaction responsive. The character counter turns amber near the
+  cap and red at it; the textarea won't accept more. Adjust `MAX_CHARS` in `index.html`
+  if you need a different ceiling.
+- The variables table renders at most **300 rows** (`MAX_DISPLAY_VARS`). This only limits
+  the editable list — **every** detected variable is still redacted in the output, and a
+  notice shows how many extra were found. (Normal logs reuse the same few values, so you'll
+  rarely see this.)
+
 ## Why
 
 Built as a governance/sanitization wrapper step: scrub identifiers out of logs and
